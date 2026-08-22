@@ -38,3 +38,18 @@ body {
   background-color: var(--color-surface-muted);
   color: var(--color-text-primary);
 }
+
+@layer base {
+  h1 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+  h2 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  h3 {
+    @apply text-xl font-semibold;
+  }
+  a {
+    @apply text-brand-600 hover:text-brand-700;
+  }
+}
