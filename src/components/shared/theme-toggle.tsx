@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
@@ -15,36 +16,73 @@ const options = [
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMounted(true), []);
 
-  // Avoid rendering theme-dependent state before hydration to prevent mismatch
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   if (!mounted) {
-    return <div className="h-9 w-27 rounded-md bg-surface-muted" />;
+    return <div className="bg-surface-muted h-9 w-9 rounded-md" />;
   }
 
+  const activeOption = options.find((opt) => opt.value === theme) ?? options[2];
+  const ActiveIcon = activeOption.icon;
+
   return (
-    <div className="flex items-center rounded-md border border-border bg-surface-muted p-0.5">
-      {options.map((opt) => {
-        const Icon = opt.icon;
-        const isActive = theme === opt.value;
-        return (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            aria-label={opt.label}
-            aria-pressed={isActive}
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-[5px] transition-colors",
-              isActive
-                ? "bg-surface text-brand-600 shadow-sm"
-                : "text-text-secondary hover:text-text-primary",
-            )}
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setIsOpen((v) => !v)}
+        aria-label="Change theme"
+        aria-expanded={isOpen}
+        className="text-text-secondary hover:bg-surface-muted hover:text-text-primary flex h-9 w-9 items-center justify-center rounded-md"
+      >
+        <ActiveIcon className="h-4.5 w-4.5" />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.96 }}
+            transition={{ duration: 0.15 }}
+            className="border-border bg-surface absolute right-0 mt-2 w-36 overflow-hidden rounded-md border shadow-lg"
           >
-            <Icon className="h-4 w-4" />
-          </button>
-        );
-      })}
+            {options.map((opt) => {
+              const Icon = opt.icon;
+              const isActive = theme === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    setTheme(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    "hover:bg-surface-muted flex w-full items-center gap-2 px-3 py-2 text-left text-sm",
+                    isActive
+                      ? "text-brand-600 font-medium"
+                      : "text-text-primary",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
