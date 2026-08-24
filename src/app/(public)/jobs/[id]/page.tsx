@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { mockJobs } from "@/lib/mock-data/jobs";
 import { formatBudget, timeAgo } from "@/features/jobs/utils";
+import { AIMatchCard } from "@/features/ai-match/components/ai-match-card";
 
 export default async function JobDetailsPage({
   params,
@@ -111,10 +112,7 @@ export default async function JobDetailsPage({
             <p className="text-text-primary text-sm font-medium">
               AI Job Match
             </p>
-            <p className="text-text-secondary mt-1 text-xs">
-              Coming in a later phase — analyze how well your profile fits this
-              job.
-            </p>
+            <AIMatchCard />
           </Card>
         </div>
       </div>

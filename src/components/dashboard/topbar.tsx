@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
 import type { MockUser } from "@/lib/mock-data/dashboard";
+import { NotificationDropdown } from "./notification-dropdown";
 
 interface TopbarProps {
   user: MockUser;
@@ -70,7 +71,7 @@ export function Topbar({
         <LanguageToggle />
         <ThemeToggle />
 
-        <Link
+        {/* <Link
           href={notificationsHref}
           aria-label="Notifications"
           className="text-text-secondary hover:bg-surface-muted hover:text-text-primary relative flex h-9 w-9 items-center justify-center rounded-md"
@@ -81,7 +82,10 @@ export function Topbar({
               {notificationCount}
             </span>
           )}
-        </Link>
+        </Link> */}
+
+        {/* notification dropdown  */}
+        <NotificationDropdown />
 
         <div className="bg-border mx-1 hidden h-6 w-px sm:block" />
 
