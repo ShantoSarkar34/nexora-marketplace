@@ -49,7 +49,7 @@ export default async function JobDetailsPage({
             <h3>Skills required</h3>
             <div className="mt-3 flex flex-wrap gap-2">
               {job.skills.map((skill) => (
-                <Badge key={skill} variant="brand">
+                <Badge className="bg-brand-50 dark:bg-status-active/10 dark:text-status-active" key={skill} variant="brand">
                   {skill}
                 </Badge>
               ))}
@@ -109,10 +109,10 @@ export default async function JobDetailsPage({
 
           {/* Placeholder for Phase 10 — AI Job Match will render here */}
           <Card className="border-dashed">
-            <p className="text-text-primary text-sm font-medium">
+            <p className="text-text-primary text-sm font-medium pb-2">
               AI Job Match
             </p>
-            <AIMatchCard />
+            <AIMatchCard/>
           </Card>
         </div>
       </div>

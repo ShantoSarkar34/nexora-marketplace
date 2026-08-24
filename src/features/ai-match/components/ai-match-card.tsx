@@ -45,7 +45,7 @@ export function AIMatchCard() {
 
   return (
     <Card>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-0">
         <Sparkles className="text-brand-600 h-4 w-4" />
         <h3>AI Job Match</h3>
       </div>
@@ -90,7 +90,7 @@ export function AIMatchCard() {
             className="mt-4 space-y-4"
           >
             <div className="flex items-center gap-3">
-              <div className="bg-brand-50 text-brand-700 flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold">
+              <div className="bg-brand-500/10 text-brand-700 dark:text-brand-600 text-md flex h-12 w-13 items-center justify-center rounded-full font-bold">
                 {result.matchScore}%
               </div>
               <div>
