@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface EmptyStateProps {
-  icon: LucideIcon;
+  icon: React.ReactNode;
   title: string;
   description: string;
   actionLabel?: string;
@@ -12,20 +12,20 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  icon: Icon,
+  icon,
   title,
   description,
   actionLabel,
   actionHref,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-card border border-dashed border-border py-12 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-muted text-text-secondary">
-        <Icon className="h-6 w-6" />
+    <div className="rounded-card border-border flex flex-col items-center justify-center gap-3 border border-dashed py-12 text-center">
+      <div className="bg-surface-muted text-text-secondary flex h-12 w-12 items-center justify-center rounded-full">
+        {icon}
       </div>
       <div>
-        <p className="text-sm font-medium text-text-primary">{title}</p>
-        <p className="mt-1 text-sm text-text-secondary">{description}</p>
+        <p className="text-text-primary text-sm font-medium">{title}</p>
+        <p className="text-text-secondary mt-1 text-sm">{description}</p>
       </div>
       {actionLabel && actionHref && (
         <Link href={actionHref}>

@@ -1,4 +1,3 @@
-"use client";
 import {
   Bell,
   Briefcase,
@@ -28,26 +27,26 @@ export default function ClientDashboardPage() {
         <StatCard
           label="Active jobs"
           value={4}
-          icon={Briefcase}
+          icon={<Briefcase className="h-5 w-5" />}
           accent="client"
         />
         <StatCard
           label="Total applications"
           value={31}
-          icon={Users}
+          icon={<Users className="h-5 w-5" />}
           accent="client"
         />
         <StatCard
           label="Active contracts"
           value={3}
-          icon={FileSignature}
+          icon={<FileSignature className="h-5 w-5" />}
           accent="client"
         />
         <StatCard
           label="Total spent"
           value={5200}
           prefix="$"
-          icon={DollarSign}
+          icon={<DollarSign className="h-5 w-5" />}
           accent="client"
         />
       </div>
@@ -58,7 +57,7 @@ export default function ClientDashboardPage() {
             <h3>Recent activity</h3>
             <div className="mt-4">
               <EmptyState
-                icon={Users}
+                icon={<Users className="h-5 w-5" />}
                 title="No recent activity"
                 description="Applications, hires, and contract updates will appear here as they happen."
               />
@@ -71,7 +70,7 @@ export default function ClientDashboardPage() {
             <h3>Job status</h3>
             <div className="mt-4">
               <EmptyState
-                icon={Briefcase}
+                icon={<Briefcase className="h-5 w-5" />}
                 title="No jobs posted yet"
                 description="Post your first job to start receiving applications."
                 actionLabel="Post a job"
@@ -83,7 +82,7 @@ export default function ClientDashboardPage() {
             <h3>Notifications</h3>
             <div className="mt-4">
               <EmptyState
-                icon={Bell}
+                icon={<Bell className="h-5 w-5" />}
                 title="You're all caught up"
                 description="New notifications will appear here."
               />

@@ -1,4 +1,3 @@
-"use client";
 import { Bell, Briefcase, Bookmark, FileText, TrendingUp } from "lucide-react";
 import { ProfileCompletionCard } from "@/components/dashboard/profile-completion-card";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -22,26 +21,26 @@ export default function FreelancerDashboardPage() {
         <StatCard
           label="Applications sent"
           value={12}
-          icon={FileText}
+          icon={<FileText className="h-5 w-5" />}
           accent="freelancer"
         />
         <StatCard
           label="Active contracts"
           value={2}
-          icon={Briefcase}
+          icon={<Briefcase className="h-5 w-5" />}
           accent="freelancer"
         />
         <StatCard
           label="Saved jobs"
           value={7}
-          icon={Bookmark}
+          icon={<Bookmark className="h-5 w-5" />}
           accent="freelancer"
         />
         <StatCard
           label="Avg. match score"
           value={87}
           suffix="%"
-          icon={TrendingUp}
+          icon={<TrendingUp className="h-5 w-5" />}
           accent="freelancer"
         />
       </div>
@@ -52,7 +51,7 @@ export default function FreelancerDashboardPage() {
             <h3>Recent applications</h3>
             <div className="mt-4">
               <EmptyState
-                icon={FileText}
+                icon={<FileText className="h-6 w-6" />}
                 title="No applications yet"
                 description="Jobs you apply to will show up here so you can track their status."
                 actionLabel="Browse jobs"
@@ -68,7 +67,7 @@ export default function FreelancerDashboardPage() {
             <h3>Recent notifications</h3>
             <div className="mt-4">
               <EmptyState
-                icon={Bell}
+                icon={<Bell className="h-6 w-6" />}
                 title="You're all caught up"
                 description="New notifications about your applications and contracts will appear here."
               />

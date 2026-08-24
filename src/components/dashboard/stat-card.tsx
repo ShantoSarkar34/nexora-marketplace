@@ -12,7 +12,7 @@ interface StatCardProps {
   value: number;
   prefix?: string;
   suffix?: string;
-  icon: LucideIcon;
+  icon: React.ReactNode;
   accent?: "brand" | "freelancer" | "client";
 }
 
@@ -27,7 +27,7 @@ export function StatCard({
   value,
   prefix,
   suffix,
-  icon: Icon,
+  icon,
   accent = "brand",
 }: StatCardProps) {
   return (
@@ -43,13 +43,18 @@ export function StatCard({
             accentClasses[accent],
           )}
         >
-          <Icon className="h-5 w-5" />
+          {icon}
         </div>
         <div>
-          <p className="text-2xl font-semibold text-text-primary">
-            <CountUp value={value} prefix={prefix} suffix={suffix} duration={0.8} />
+          <p className="text-text-primary text-2xl font-semibold">
+            <CountUp
+              value={value}
+              prefix={prefix}
+              suffix={suffix}
+              duration={0.8}
+            />
           </p>
-          <p className="text-sm text-text-secondary">{label}</p>
+          <p className="text-text-secondary text-sm">{label}</p>
         </div>
       </Card>
     </motion.div>
