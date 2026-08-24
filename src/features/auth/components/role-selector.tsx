@@ -44,7 +44,7 @@ export function RoleSelector({ value, onChange }: RoleSelectorProps) {
             className={cn(
               "flex flex-col items-start gap-1 rounded-md border p-3 text-left transition-colors",
               isActive
-                ? "border-brand-600 bg-brand-50"
+                ? "border-brand-600 bg-brand-50 dark:bg-brand-600/15"
                 : "border-border hover:bg-surface-muted",
             )}
           >
@@ -54,10 +54,10 @@ export function RoleSelector({ value, onChange }: RoleSelectorProps) {
                 isActive ? "text-brand-600" : "text-text-secondary",
               )}
             />
-            <span className="text-sm font-medium text-text-primary">
+            <span className="text-text-primary text-sm font-medium">
               {role.label}
             </span>
-            <span className="text-xs text-text-secondary">
+            <span className="text-text-secondary text-xs">
               {role.description}
             </span>
           </button>

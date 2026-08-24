@@ -21,7 +21,7 @@ export function MatchPreviewCard() {
         <motion.div
           animate={{ scale: [1, 1.06, 1] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="bg-brand-50 text-brand-700 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+          className="bg-brand-50 text-brand-700 dark:text-brand-600 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-sm font-bold"
         >
           94%
         </motion.div>

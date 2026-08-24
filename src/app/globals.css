@@ -21,7 +21,7 @@
   --color-status-error: #ef4444;
   --color-status-neutral: #6b7280;
 
-  /* Surface & text (light defaults) */
+  /* Surface & text - Light theme */
   --color-surface: #ffffff;
   --color-surface-muted: #f9fafb;
   --color-border: #e5e7eb;
@@ -36,12 +36,36 @@
   --radius-card: 0.75rem;
 }
 
+/* Dark theme */
 .dark {
-  --color-surface: #111827;
-  --color-surface-muted: #1f2937;
-  --color-border: #374151;
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #9ca3af;
+  /* Brand - brighter for dark backgrounds */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #c7d2fe;
+  --color-brand-500: #818cf8;
+  --color-brand-600: #818cf8;
+  --color-brand-700: #a5b4fc;
+
+  /* Role accents */
+  --color-client-500: #38bdf8;
+  --color-freelancer-500: #34d399;
+
+  /* Status colors */
+  --color-status-pending: #fbbf24;
+  --color-status-active: #34d399;
+  --color-status-success: #4ade80;
+  --color-status-error: #f87171;
+  --color-status-neutral: #94a3b8;
+
+  /* Surfaces */
+  --color-surface: #182230;
+  --color-surface-muted: #111827;
+
+  /* Borders */
+  --color-border: #334155;
+
+  /* Text */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
 }
 
 body {
@@ -56,12 +80,15 @@ body {
   h1 {
     @apply text-3xl font-semibold tracking-tight;
   }
+
   h2 {
     @apply text-2xl font-semibold tracking-tight;
   }
+
   h3 {
     @apply text-xl font-semibold;
   }
+
   a {
     @apply text-brand-600 hover:text-brand-700;
   }
