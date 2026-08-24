@@ -5,11 +5,17 @@ import { useInView, useMotionValue, useSpring } from "framer-motion";
 
 interface CountUpProps {
   value: number;
+  prefix?: string;
   suffix?: string;
   duration?: number;
 }
 
-export function CountUp({ value, suffix = "", duration = 1.2 }: CountUpProps) {
+export function CountUp({
+  value,
+  prefix = "",
+  suffix = "",
+  duration = 1.2,
+}: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const motionValue = useMotionValue(0);
@@ -32,6 +38,7 @@ export function CountUp({ value, suffix = "", duration = 1.2 }: CountUpProps) {
 
   return (
     <span ref={ref}>
+      {prefix}
       {displayValue.toLocaleString()}
       {suffix}
     </span>
