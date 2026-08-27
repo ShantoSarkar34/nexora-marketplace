@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { LanguageProvider } from "@/providers/language-provider";
 
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -30,7 +31,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <LanguageProvider>{children}</LanguageProvider>
+            <LanguageProvider>
+              {children}
+              <Toaster richColors position="top-right" closeButton />
+            </LanguageProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

@@ -3,12 +3,30 @@ import { env } from "@/lib/env";
 export class ApiError extends Error {
   constructor(
     public status: number,
-    public code: string | undefined,
     message: string,
+    public errors?: Record<string, string[]>,
   ) {
     super(message);
     this.name = "ApiError";
   }
+}
+
+interface ApiSuccess<T> {
+  success: true;
+  message: string;
+  data: T;
+  meta?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+interface ApiFailure {
+  success: false;
+  message: string;
+  errors?: Record<string, string[]>;
 }
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
@@ -18,33 +36,44 @@ interface RequestOptions extends Omit<RequestInit, "body"> {
 async function request<T>(
   path: string,
   options: RequestOptions = {},
-): Promise<T> {
+): Promise<ApiSuccess<T>> {
   const { body, headers, ...rest } = options;
 
-  const response = await fetch(`${env.NEXT_PUBLIC_API_URL}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    credentials: "include", // sends HTTP-only auth cookies
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${env.NEXT_PUBLIC_API_URL}${path}`, {
+      ...rest,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      credentials: "include", // required — sends the httpOnly accessToken cookie
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    // Network failure (offline, CORS block, server unreachable) — status 0
+    // signals "couldn't even reach the server" vs. a real HTTP error code.
+    throw new ApiError(
+      0,
+      "Unable to reach the server. Check your connection and try again.",
+    );
+  }
 
   const isJson = response.headers
     .get("content-type")
     ?.includes("application/json");
-  const data = isJson ? await response.json() : null;
+  const payload = isJson ? await response.json() : null;
 
   if (!response.ok) {
+    const failure = payload as ApiFailure | null;
     throw new ApiError(
       response.status,
-      data?.code,
-      data?.message ?? "Something went wrong",
+      failure?.message ?? "Something went wrong. Please try again.",
+      failure?.errors,
     );
   }
 
-  return data as T;
+  return payload as ApiSuccess<T>;
 }
 
 export const apiClient = {

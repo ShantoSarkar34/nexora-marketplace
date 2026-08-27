@@ -44,14 +44,14 @@ export default function HomePage() {
           <motion.h1
             variants={fadeUp}
             transition={{ duration: 0.5 }}
-            className="text-4xl font-bold tracking-tight text-text-primary sm:text-5xl"
+            className="text-text-primary text-4xl font-bold tracking-tight sm:text-5xl"
           >
             Freelance work, matched by what your skills actually say.
           </motion.h1>
           <motion.p
             variants={fadeUp}
             transition={{ duration: 0.5 }}
-            className="mt-6 text-lg text-text-secondary"
+            className="text-text-secondary mt-6 text-lg"
           >
             Nexora reads the real overlap between a freelancer&apos;s profile
             and a job&apos;s requirements — so freelancers apply to jobs they
@@ -68,7 +68,11 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/register?role=client">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="w-full sm:w-auto"
+              >
                 Hire talent
               </Button>
             </Link>
@@ -77,7 +81,7 @@ export default function HomePage() {
         <MatchPreviewCard />
       </section>
 
-      <section className="border-y border-border bg-surface-muted">
+      <section className="border-border bg-surface-muted border-y">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-12 sm:grid-cols-3 sm:px-6 lg:px-8">
           {stats.map((stat) => (
             <motion.div
@@ -89,10 +93,10 @@ export default function HomePage() {
               transition={{ duration: 0.5 }}
               className="text-center"
             >
-              <p className="text-3xl font-bold text-brand-600">
+              <p className="text-brand-600 text-3xl font-bold">
                 <CountUp value={stat.value} suffix={stat.suffix} />
               </p>
-              <p className="mt-1 text-sm text-text-secondary">{stat.label}</p>
+              <p className="text-text-secondary mt-1 text-sm">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -116,13 +120,16 @@ export default function HomePage() {
             viewport={{ once: true }}
             variants={fadeUp}
             transition={{ duration: 0.5 }}
-            className="rounded-card border border-freelancer-500/20 bg-surface p-6"
+            className="rounded-card border-freelancer-500/20 bg-surface border p-6"
           >
             <h3 className="text-freelancer-500">For Freelancers</h3>
             <ol className="mt-4 space-y-3">
               {freelancerSteps.map((step, i) => (
-                <li key={step} className="flex gap-3 text-sm text-text-secondary">
-                  <span className="font-semibold text-freelancer-500">
+                <li
+                  key={step}
+                  className="text-text-secondary flex gap-3 text-sm"
+                >
+                  <span className="text-freelancer-500 font-semibold">
                     {i + 1}.
                   </span>
                   {step}
@@ -136,13 +143,16 @@ export default function HomePage() {
             viewport={{ once: true }}
             variants={fadeUp}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-card border border-client-500/20 bg-surface p-6"
+            className="rounded-card border-client-500/20 bg-surface border p-6"
           >
             <h3 className="text-client-500">For Clients</h3>
             <ol className="mt-4 space-y-3">
               {clientSteps.map((step, i) => (
-                <li key={step} className="flex gap-3 text-sm text-text-secondary">
-                  <span className="font-semibold text-client-500">
+                <li
+                  key={step}
+                  className="text-text-secondary flex gap-3 text-sm"
+                >
+                  <span className="text-client-500 font-semibold">
                     {i + 1}.
                   </span>
                   {step}
@@ -163,7 +173,7 @@ export default function HomePage() {
       >
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
           <h2 className="text-white">Ready to get matched?</h2>
-          <p className="mt-3 text-brand-100">
+          <p className="text-brand-100 mt-3">
             Join Nexora and let your skills do the talking.
           </p>
           <div className="mt-8 flex justify-center gap-3">
