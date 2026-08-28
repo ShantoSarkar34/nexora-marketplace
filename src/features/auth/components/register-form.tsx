@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { AuthCard } from "@/components/shared/auth-card";
 import { RoleSelector } from "@/features/auth/components/role-selector";
@@ -13,25 +13,32 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/shared/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Alert } from "@/components/ui/alert";
+import { GoogleSignInButton } from "@/components/shared/google-sign-in-button";
+import { useGoogleLogin, useRegister } from "@/hooks/use-auth-mutations";
+import { ApiError } from "@/lib/api-client";
+import { applyApiFieldErrors } from "@/lib/apply-api-field-errors";
 import {
   registerSchema,
   type RegisterFormValues,
   type UserRole,
 } from "@/features/auth/schemas";
+import { env } from "@/lib/env";
 
 export function RegisterForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialRole: UserRole =
     searchParams.get("role") === "client" ? "CLIENT" : "FREELANCER";
 
-  const [submitted, setSubmitted] = useState(false);
+  const registerMutation = useRegister();
+  const googleMutation = useGoogleLogin();
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -40,28 +47,38 @@ export function RegisterForm() {
 
   const role = watch("role");
 
+  console.log(env.NEXT_PUBLIC_API_URL,env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+  
+
   async function onSubmit(values: RegisterFormValues) {
-    // Track B: replace with real API call -> services/auth.ts:register(values)
-    console.log("Register (mock):", values);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setSubmitted(true);
+    try {
+      await registerMutation.mutateAsync({
+        name: values.fullName,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+      });
+      toast.success("Account created — log in to continue.");
+      router.push(`/login?email=${encodeURIComponent(values.email)}`);
+    } catch (error) {
+      if (error instanceof ApiError && error.errors) {
+        applyApiFieldErrors(setError, error.errors);
+      }
+      // Other failures (e.g. 409 duplicate email) are already toasted
+      // globally by the mutation cache in query-provider.
+    }
   }
 
-  if (submitted) {
-    return (
-      <AuthCard title="Check your email">
-        <Alert variant="success">
-          We&apos;ve sent a verification link to your email address. Click it to
-          activate your account.
-        </Alert>
-        <p className="text-text-secondary mt-4 text-sm">
-          Didn&apos;t get it?{" "}
-          <Link href="/resend-verification" className="font-medium">
-            Resend verification email
-          </Link>
-        </p>
-      </AuthCard>
-    );
+  async function handleGoogleToken(idToken: string) {
+    try {
+      const user = await googleMutation.mutateAsync({ idToken, role });
+      toast.success(`Welcome, ${user.name}`);
+      router.push(
+        user.role === "CLIENT" ? "/client/dashboard" : "/freelancer/dashboard",
+      );
+    } catch {
+      // toasted globally
+    }
   }
 
   return (
@@ -158,10 +175,25 @@ export function RegisterForm() {
           )}
         </div>
 
-        <Button type="submit" className="w-full" isLoading={isSubmitting}>
+        <Button
+          type="submit"
+          className="w-full"
+          isLoading={isSubmitting || registerMutation.isPending}
+        >
           Create account
         </Button>
       </form>
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="border-border w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-surface text-text-secondary px-2">or</span>
+        </div>
+      </div>
+
+      <GoogleSignInButton onToken={handleGoogleToken} />
 
       <p className="text-text-secondary mt-6 text-center text-sm">
         Already have an account?{" "}

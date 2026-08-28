@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/features/dashboard/nav-config";
-import type { UserRole } from "@/features/auth/schemas";
+import type { UserRole } from "@/types/user";
 
 interface SidebarContentProps {
   navItems: NavItem[];
@@ -16,11 +16,13 @@ interface SidebarContentProps {
 const accentText: Record<UserRole, string> = {
   FREELANCER: "text-freelancer-500",
   CLIENT: "text-client-500",
+  ADMIN: "text-brand-600",
 };
 
 const accentBg: Record<UserRole, string> = {
   FREELANCER: "bg-freelancer-500/10",
   CLIENT: "bg-client-500/10",
+  ADMIN: "bg-brand-500/10",
 };
 
 export function SidebarContent({

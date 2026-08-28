@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/shared/password-input";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
+import { useResetPassword } from "@/hooks/use-auth-mutations";
 import {
   resetPasswordSchema,
   type ResetPasswordFormValues,
@@ -20,20 +21,24 @@ export function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [submitted, setSubmitted] = useState(false);
+  const resetPassword = useResetPassword();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
   });
 
   async function onSubmit(values: ResetPasswordFormValues) {
-    // Track B: replace with real API call -> services/auth.ts:resetPassword(token, values)
-    console.log("Reset password (mock):", { token, ...values });
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setSubmitted(true);
+    if (!token) return;
+    try {
+      await resetPassword.mutateAsync({ token, newPassword: values.password });
+      setSubmitted(true);
+    } catch {
+      // toasted globally
+    }
   }
 
   if (!token) {
@@ -82,7 +87,6 @@ export function ResetPasswordForm() {
             </p>
           )}
         </div>
-
         <div>
           <Label htmlFor="confirmPassword">Confirm new password</Label>
           <PasswordInput
@@ -96,8 +100,11 @@ export function ResetPasswordForm() {
             </p>
           )}
         </div>
-
-        <Button type="submit" className="w-full" isLoading={isSubmitting}>
+        <Button
+          type="submit"
+          className="w-full"
+          isLoading={resetPassword.isPending}
+        >
           Reset password
         </Button>
       </form>

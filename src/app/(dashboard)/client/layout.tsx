@@ -1,16 +1,27 @@
+"use client";
+
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { clientNavItems } from "@/features/dashboard/nav-config";
-import { mockUsers } from "@/lib/mock-data/dashboard";
+import { useAuth } from "@/hooks/use-auth";
 
-// Track B: swap mockUsers.CLIENT for the real authenticated user,
-// and add role + ownership checks (redirect non-clients away).
 export default function ClientDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <DashboardShell navItems={clientNavItems} user={mockUsers.CLIENT}>
+    <ProtectedRoute allowedRoles={["CLIENT"]}>
+      <ClientShell>{children}</ClientShell>
+    </ProtectedRoute>
+  );
+}
+
+function ClientShell({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <DashboardShell navItems={clientNavItems} user={user}>
       {children}
     </DashboardShell>
   );

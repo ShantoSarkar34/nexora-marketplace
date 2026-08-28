@@ -5,12 +5,13 @@ import { useState } from "react";
 import { DesktopSidebar } from "@/components/dashboard/desktop-sidebar";
 import { MobileSidebar } from "@/components/dashboard/mobile-sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
+import { VerificationBanner } from "@/features/auth/components/verification-banner";
 import type { NavItem } from "@/features/dashboard/nav-config";
-import type { MockUser } from "@/lib/mock-data/dashboard";
+import type { AuthUser } from "@/types/user";
 
 interface DashboardShellProps {
   navItems: NavItem[];
-  user: MockUser;
+  user: AuthUser;
   children: React.ReactNode;
 }
 
@@ -32,12 +33,11 @@ export function DashboardShell({
       />
 
       <div className="md:pl-64">
-        <Topbar
-          user={user}
-          onMenuClick={() => setMobileOpen(true)}
-          notificationCount={3}
-        />
-        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+        <Topbar user={user} onMenuClick={() => setMobileOpen(true)} />
+        <main className="space-y-4 p-4 sm:space-y-6 sm:p-6 lg:p-8">
+          {!user.isVerified && <VerificationBanner />}
+          {children}
+        </main>
       </div>
     </div>
   );

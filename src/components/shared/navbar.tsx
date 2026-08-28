@@ -1,24 +1,40 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
 import { useLanguage } from "@/providers/language-provider";
+import { useAuth } from "@/hooks/use-auth";
+import { useLogout } from "@/hooks/use-auth-mutations";
+import { getInitials } from "@/lib/get-initials";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const logout = useLogout();
+  const router = useRouter();
 
   const navLinks = [
     { href: "/jobs", label: t.nav.browseJobs },
     { href: "/freelancers", label: t.nav.findTalent },
     { href: "/about", label: t.nav.about },
   ];
+
+  const dashboardHref =
+    user?.role === "CLIENT" ? "/client/dashboard" : "/freelancer/dashboard";
+
+  async function handleLogout() {
+    setIsOpen(false);
+    await logout.mutateAsync();
+    router.push("/");
+  }
 
   return (
     <header className="border-border bg-surface/80 sticky top-0 z-50 border-b backdrop-blur">
@@ -43,14 +59,41 @@ export function Navbar() {
           <LanguageToggle />
           <ThemeToggle />
           <div className="bg-border mx-1 h-6 w-px" />
-          <Link href="/login">
-            <Button variant="ghost" size="sm">
-              {t.nav.login}
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button size="sm">{t.nav.signup}</Button>
-          </Link>
+          {isLoading ? (
+            <div className="bg-surface-muted h-8 w-20 animate-pulse rounded-md" />
+          ) : isAuthenticated && user ? (
+            <>
+              <span className="bg-brand-100 text-brand-700 flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold">
+                {getInitials(user.name)}
+              </span>
+              <Link href={dashboardHref}>
+                <Button variant="ghost" size="sm">
+                  <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleLogout}
+                isLoading={logout.isPending}
+              >
+                <LogOut className="mr-1.5 h-3.5 w-3.5" />
+                Log out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  {t.nav.login}
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm">{t.nav.signup}</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -110,14 +153,33 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-2">
-                <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="secondary" className="w-full">
-                    {t.nav.login}
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full">{t.nav.signup}</Button>
-                </Link>
+                {isAuthenticated && user ? (
+                  <>
+                    <Link href={dashboardHref} onClick={() => setIsOpen(false)}>
+                      <Button variant="secondary" className="w-full">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button
+                      className="w-full"
+                      onClick={handleLogout}
+                      isLoading={logout.isPending}
+                    >
+                      Log out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Button variant="secondary" className="w-full">
+                        {t.nav.login}
+                      </Button>
+                    </Link>
+                    <Link href="/register" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full">{t.nav.signup}</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

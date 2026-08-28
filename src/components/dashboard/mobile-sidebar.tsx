@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 
 import { SidebarContent } from "@/components/dashboard/sidebar-content";
 import type { NavItem } from "@/features/dashboard/nav-config";
-import type { UserRole } from "@/features/auth/schemas";
+import type { UserRole } from "@/types/user";
 
 interface MobileSidebarProps {
   isOpen: boolean;
