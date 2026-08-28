@@ -7,36 +7,38 @@ export interface Experience {
   id: string;
   title: string;
   company: string;
-  startDate: string; // "2023-01"
-  endDate: string | null; // null = current
-  description: string;
+  startDate: string;
+  endDate: string | null;
+  isCurrent: boolean;
+  description?: string;
 }
 
 export interface PortfolioItem {
   id: string;
   title: string;
-  description: string;
-  link?: string;
+  description?: string;
+  projectUrl?: string;
+  imageUrl?: string;
 }
 
 export interface FreelancerProfile {
-  name: string;
+  id: string;
+  userId: string;
   title: string;
   bio: string;
   hourlyRate: number;
-  location: string;
+  completionPercentage: number;
   skills: Skill[];
   experience: Experience[];
   portfolio: PortfolioItem[];
-  avatarInitials: string;
 }
 
 export interface ClientProfile {
-  name: string;
-  companyName: string;
-  companyDescription: string;
-  industry: string;
-  location: string;
+  id: string;
+  userId: string;
+  companyName?: string;
+  industry?: string;
+  companySize?: string;
   website?: string;
-  avatarInitials: string;
+  about?: string;
 }

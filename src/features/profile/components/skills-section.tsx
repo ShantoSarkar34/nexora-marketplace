@@ -2,36 +2,41 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAddSkill, useRemoveSkill } from "@/hooks/use-freelancer-profile";
 import type { Skill } from "@/types/profile";
 
-interface Props {
-  skills: Skill[];
-  onChange: (skills: Skill[]) => void;
-}
-
-export function SkillsSection({ skills, onChange }: Props) {
+export function SkillsSection({ skills }: { skills: Skill[] }) {
   const [newSkill, setNewSkill] = useState("");
+  const addSkill = useAddSkill();
+  const removeSkill = useRemoveSkill();
 
-  function addSkill() {
+  async function handleAdd() {
     const trimmed = newSkill.trim();
     if (!trimmed) return;
     if (skills.some((s) => s.name.toLowerCase() === trimmed.toLowerCase())) {
       setNewSkill("");
       return;
     }
-    // Track B: replace with real API call -> services/profile.ts:addSkill(trimmed)
-    onChange([...skills, { id: `s-${Date.now()}`, name: trimmed }]);
-    setNewSkill("");
+    try {
+      await addSkill.mutateAsync(trimmed);
+      setNewSkill("");
+    } catch {
+      // toasted globally
+    }
   }
 
-  function removeSkill(id: string) {
-    // Track B: replace with real API call -> services/profile.ts:removeSkill(id)
-    onChange(skills.filter((s) => s.id !== id));
+  async function handleRemove(id: string) {
+    try {
+      await removeSkill.mutateAsync(id);
+    } catch {
+      // toasted globally
+    }
   }
 
   return (
@@ -39,7 +44,7 @@ export function SkillsSection({ skills, onChange }: Props) {
       <h3>Skills</h3>
       <div className="mt-4 flex flex-wrap gap-2">
         {skills.length === 0 ? (
-          <p className="text-sm text-text-secondary">
+          <p className="text-text-secondary text-sm">
             No skills added yet — add your first one below.
           </p>
         ) : (
@@ -47,9 +52,9 @@ export function SkillsSection({ skills, onChange }: Props) {
             <Badge key={skill.id} variant="brand" className="gap-1.5 pr-1.5">
               {skill.name}
               <button
-                onClick={() => removeSkill(skill.id)}
+                onClick={() => handleRemove(skill.id)}
                 aria-label={`Remove ${skill.name}`}
-                className="rounded-full hover:bg-brand-100"
+                className="hover:bg-brand-100 rounded-full"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -65,11 +70,16 @@ export function SkillsSection({ skills, onChange }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              addSkill();
+              handleAdd();
             }
           }}
         />
-        <Button type="button" size="sm" onClick={addSkill}>
+        <Button
+          type="button"
+          size="sm"
+          onClick={handleAdd}
+          isLoading={addSkill.isPending}
+        >
           Add
         </Button>
       </div>
