@@ -28,7 +28,7 @@ const mockResult: AIMatchResult = {
   ],
 };
 
-export function AIMatchCard() {
+export function AIMatchCard({ jobId }: { jobId: string }) {
   const [state, setState] = useState<MatchState>("idle");
   const [result, setResult] = useState<AIMatchResult | null>(null);
 

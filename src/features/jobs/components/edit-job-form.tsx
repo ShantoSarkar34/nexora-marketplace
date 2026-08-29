@@ -1,29 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
+import { applyApiFieldErrors } from "@/lib/apply-api-field-errors";
+import { ApiError } from "@/lib/api-client";
+import { useUpdateJob } from "@/hooks/use-jobs";
+import { experienceLevelLabels, jobCategoryLabels } from "@/types/enums";
 import {
-  CreateJobFormInput,
   createJobSchema,
+  type CreateJobFormInput,
   type CreateJobFormValues,
 } from "@/features/jobs/schemas";
 import type { Job } from "@/types/job";
+import { getJobSkillNames } from "../utils";
 
 export function EditJobForm({ job }: { job: Job }) {
-  const [success, setSuccess] = useState(false);
+  const updateJob = useUpdateJob(job.id);
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<CreateJobFormInput, unknown, CreateJobFormValues>({
     resolver: zodResolver(createJobSchema),
@@ -31,28 +36,27 @@ export function EditJobForm({ job }: { job: Job }) {
       title: job.title,
       description: job.description,
       category: job.category,
-      skills: job.skills.join(", "),
+      skills: getJobSkillNames(job).join(", "),
       budgetType: job.budgetType,
       budgetMin: job.budgetMin,
       budgetMax: job.budgetMax,
       experienceLevel: job.experienceLevel,
+      deadline: job.deadline,
     },
   });
 
   async function onSubmit(values: CreateJobFormValues) {
-    // Track B: replace with real API call -> services/jobs.ts:updateJob(job.id, values)
-    console.log("Update job (mock):", values);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setSuccess(true);
+    try {
+      await updateJob.mutateAsync(values);
+      toast.success("Job updated.");
+    } catch (error) {
+      if (error instanceof ApiError && error.errors)
+        applyApiFieldErrors(setError, error.errors);
+    }
   }
 
   return (
     <Card>
-      {success && (
-        <Alert variant="success" className="mb-5">
-          Job updated (mock). Real save will apply once Track B is wired up.
-        </Alert>
-      )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
           <Label htmlFor="title">Job title</Label>
@@ -76,20 +80,21 @@ export function EditJobForm({ job }: { job: Job }) {
           <div>
             <Label htmlFor="category">Category</Label>
             <Select id="category" {...register("category")}>
-              <option value="Web Development">Web Development</option>
-              <option value="Mobile Development">Mobile Development</option>
-              <option value="Design">Design</option>
-              <option value="Writing">Writing</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Data Science">Data Science</option>
+              {Object.entries(jobCategoryLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </Select>
           </div>
           <div>
             <Label htmlFor="experienceLevel">Experience level</Label>
             <Select id="experienceLevel" {...register("experienceLevel")}>
-              <option value="Entry">Entry</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Expert">Expert</option>
+              {Object.entries(experienceLevelLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </Select>
           </div>
         </div>
@@ -119,7 +124,7 @@ export function EditJobForm({ job }: { job: Job }) {
             )}
           </div>
         </div>
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" isLoading={isSubmitting || updateJob.isPending}>
           Save Changes
         </Button>
       </form>

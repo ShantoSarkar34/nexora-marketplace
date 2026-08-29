@@ -1,9 +1,27 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { Star } from "lucide-react";
-
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import type { Review } from "@/types/review";
+import { reviewsService } from "@/services/reviews";
 
-export function ReviewList({ reviews }: { reviews: Review[] }) {
+export function ReviewList({ userId }: { userId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["reviews", "user", userId],
+    queryFn: () => reviewsService.getForUser(userId, { limit: 10 }),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-6">
+        <Spinner className="h-6 w-6" />
+      </div>
+    );
+  }
+
+  const reviews = data?.reviews ?? [];
+
   if (reviews.length === 0) {
     return <p className="text-text-secondary text-sm">No reviews yet.</p>;
   }
@@ -33,8 +51,12 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
               ))}
             </div>
           </div>
-          <p className="text-text-secondary mt-1 text-sm">{review.comment}</p>
-          <p className="text-text-secondary mt-1 text-xs">{review.createdAt}</p>
+          {review.comment && (
+            <p className="text-text-secondary mt-1 text-sm">{review.comment}</p>
+          )}
+          <p className="text-text-secondary mt-1 text-xs">
+            {new Date(review.createdAt).toLocaleDateString()}
+          </p>
         </div>
       ))}
     </div>

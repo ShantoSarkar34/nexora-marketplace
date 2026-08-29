@@ -1,48 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Alert } from "@/components/ui/alert";
 import { Card } from "@/components/ui/card";
+import { applyApiFieldErrors } from "@/lib/apply-api-field-errors";
+import { ApiError } from "@/lib/api-client";
+import { useCreateJob } from "@/hooks/use-jobs";
+import { experienceLevelLabels, jobCategoryLabels } from "@/types/enums";
 import {
-  CreateJobFormInput,
   createJobSchema,
+  type CreateJobFormInput,
   type CreateJobFormValues,
 } from "@/features/jobs/schemas";
 
 export function CreateJobForm() {
-  const [success, setSuccess] = useState(false);
+  const router = useRouter();
+  const createJob = useCreateJob();
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<CreateJobFormInput, unknown, CreateJobFormValues>({
     resolver: zodResolver(createJobSchema),
-    defaultValues: { budgetType: "FIXED", experienceLevel: "Intermediate" },
+    defaultValues: { budgetType: "FIXED", experienceLevel: "INTERMEDIATE" },
   });
 
   async function onSubmit(values: CreateJobFormValues) {
-    // Track B: replace with real API call -> services/jobs.ts:createJob(values)
-    console.log("Create job (mock):", values);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setSuccess(true);
-  }
-
-  if (success) {
-    return (
-      <Alert variant="success">
-        Your job has been posted (mock). It will appear in &quot;My Jobs&quot;
-        once real data is wired up in Track B.
-      </Alert>
-    );
+    try {
+      const job = await createJob.mutateAsync(values);
+      toast.success("Job saved as draft — publish it from My Jobs when ready.");
+      router.push(`/client/jobs/${job.id}/edit`);
+    } catch (error) {
+      if (error instanceof ApiError && error.errors)
+        applyApiFieldErrors(setError, error.errors);
+    }
   }
 
   return (
@@ -81,20 +82,21 @@ export function CreateJobForm() {
           <div>
             <Label htmlFor="category">Category</Label>
             <Select id="category" {...register("category")}>
-              <option value="Web Development">Web Development</option>
-              <option value="Mobile Development">Mobile Development</option>
-              <option value="Design">Design</option>
-              <option value="Writing">Writing</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Data Science">Data Science</option>
+              {Object.entries(jobCategoryLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </Select>
           </div>
           <div>
             <Label htmlFor="experienceLevel">Experience level</Label>
             <Select id="experienceLevel" {...register("experienceLevel")}>
-              <option value="Entry">Entry</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Expert">Expert</option>
+              {Object.entries(experienceLevelLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </Select>
           </div>
         </div>
@@ -141,8 +143,13 @@ export function CreateJobForm() {
           </div>
         </div>
 
-        <Button type="submit" isLoading={isSubmitting}>
-          Post Job
+        <div>
+          <Label htmlFor="deadline">Application deadline (optional)</Label>
+          <Input id="deadline" type="date" {...register("deadline")} />
+        </div>
+
+        <Button type="submit" isLoading={isSubmitting || createJob.isPending}>
+          Save as Draft
         </Button>
       </form>
     </Card>

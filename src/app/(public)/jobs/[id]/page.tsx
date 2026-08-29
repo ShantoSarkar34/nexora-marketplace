@@ -1,23 +1,63 @@
-import { notFound } from "next/navigation";
-import { Briefcase, Clock, DollarSign, Users } from "lucide-react";
+"use client";
+
+import { useParams, notFound } from "next/navigation";
+import { Briefcase, Bookmark, Clock, DollarSign, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockJobs } from "@/lib/mock-data/jobs";
-import { formatBudget, timeAgo } from "@/features/jobs/utils";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
+import { experienceLevelLabels } from "@/types/enums";
+import { useJob, useSaveJob, useUnsaveJob } from "@/hooks/use-jobs";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  formatBudget,
+  timeAgo,
+  categoryLabel,
+  budgetTypeLabel,
+  getJobSkillNames,
+} from "@/features/jobs/utils";
 import { AIMatchCard } from "@/features/ai-match/components/ai-match-card";
+import { ApplyJobDialog } from "@/features/applications/components/apply-job-dialog";
+import { useState } from "react";
 
-export default async function JobDetailsPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  // Track B: replace with GET /jobs/:id
-  const job = mockJobs.find((j) => j.id === id);
+export default function JobDetailsPage() {
+  const params = useParams<{ id: string }>();
+  const { user, isAuthenticated } = useAuth();
+  const { data: job, isLoading, isError } = useJob(params.id);
+  const saveJob = useSaveJob();
+  const unsaveJob = useUnsaveJob();
+  const [applyOpen, setApplyOpen] = useState(false);
 
-  if (!job) notFound();
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner className="h-8 w-8" />
+      </div>
+    );
+  }
+  if (isError || !job) notFound();
+
+  const isFreelancer = isAuthenticated && user?.role === "FREELANCER";
+  const isPending = saveJob.isPending || unsaveJob.isPending;
+
+  async function toggleSave() {
+    if (!isFreelancer) {
+      toast.info("Log in as a freelancer to save jobs.");
+      return;
+    }
+    try {
+      if (job!.isSaved) {
+        await unsaveJob.mutateAsync(job!.id);
+      } else {
+        await saveJob.mutateAsync(job!.id);
+      }
+    } catch {
+      // toasted globally
+    }
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -29,12 +69,12 @@ export default async function JobDetailsPage({
                 {job.status}
               </Badge>
               <span className="text-text-secondary text-xs">
-                Posted {timeAgo(job.postedAt)}
+                Posted {timeAgo(job.createdAt)}
               </span>
             </div>
             <h1 className="mt-2">{job.title}</h1>
             <p className="text-text-secondary mt-1 text-sm">
-              {job.clientName} · {job.category}
+              {job.clientName} · {categoryLabel(job)}
             </p>
           </div>
 
@@ -48,9 +88,9 @@ export default async function JobDetailsPage({
           <Card>
             <h3>Skills required</h3>
             <div className="mt-3 flex flex-wrap gap-2">
-              {job.skills.map((skill) => (
-                <Badge className="bg-brand-50 dark:bg-status-active/10 dark:text-status-active" key={skill} variant="brand">
-                  {skill}
+              {getJobSkillNames(job).map((name) => (
+                <Badge key={name} variant="brand">
+                  {name}
                 </Badge>
               ))}
             </div>
@@ -76,7 +116,7 @@ export default async function JobDetailsPage({
                     Experience level
                   </p>
                   <p className="text-text-primary text-sm font-semibold">
-                    {job.experienceLevel}
+                    {experienceLevelLabels[job.experienceLevel]}
                   </p>
                 </div>
               </div>
@@ -94,28 +134,64 @@ export default async function JobDetailsPage({
                 <div>
                   <p className="text-text-secondary text-xs">Budget type</p>
                   <p className="text-text-primary text-sm font-semibold">
-                    {job.budgetType === "HOURLY" ? "Hourly" : "Fixed price"}
+                    {budgetTypeLabel(job)}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Track B: this triggers the real application flow (Phase 6) */}
-            <Button className="mt-6 w-full">Apply Now</Button>
-            <Button variant="secondary" className="mt-2 w-full">
-              Save Job
-            </Button>
+            {job.status === "OPEN" && (
+              <>
+                {isFreelancer ? (
+                  <Button
+                    className="mt-6 w-full"
+                    onClick={() => setApplyOpen(true)}
+                  >
+                    Apply Now
+                  </Button>
+                ) : !isAuthenticated ? (
+                  <Button
+                    className="mt-6 w-full"
+                    onClick={() =>
+                      toast.info("Log in as a freelancer to apply.")
+                    }
+                  >
+                    Apply Now
+                  </Button>
+                ) : null}
+                {isFreelancer && (
+                  <Button
+                    variant="secondary"
+                    className="mt-2 w-full"
+                    onClick={toggleSave}
+                    isLoading={isPending}
+                  >
+                    <Bookmark
+                      className={cn(
+                        "mr-1.5 h-4 w-4",
+                        job.isSaved && "fill-current",
+                      )}
+                    />
+                    {job.isSaved ? "Saved" : "Save Job"}
+                  </Button>
+                )}
+              </>
+            )}
           </Card>
 
-          {/* Placeholder for Phase 10 — AI Job Match will render here */}
-          <Card className="border-dashed">
-            <p className="text-text-primary text-sm font-medium pb-2">
-              AI Job Match
-            </p>
-            <AIMatchCard/>
-          </Card>
+          {isFreelancer && job.status === "OPEN" && (
+            <AIMatchCard jobId={job.id} />
+          )}
         </div>
       </div>
+
+      {isFreelancer && (
+        <ApplyJobDialog
+          job={job}
+          open={applyOpen}
+          onOpenChange={setApplyOpen}
+        />
+      )}
     </div>
   );
 }

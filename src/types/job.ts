@@ -1,28 +1,42 @@
-export type JobCategory =
-  | "Web Development"
-  | "Mobile Development"
-  | "Design"
-  | "Writing"
-  | "Marketing"
-  | "Data Science";
+import type { BudgetType, ExperienceLevel, JobCategory, JobStatus } from "@/types/enums";
 
-export type ExperienceLevel = "Entry" | "Intermediate" | "Expert";
-export type JobStatus = "OPEN" | "CLOSED" | "DRAFT";
-export type BudgetType = "FIXED" | "HOURLY";
+export interface JobSkillRelation {
+  id: string;
+  jobId: string;
+  skillId: string;
+  skill: {
+    id: string;
+    name: string;
+  };
+}
 
 export interface Job {
   id: string;
   title: string;
   description: string;
   category: JobCategory;
-  skills: string[];
+  skills: JobSkillRelation[];
   budgetType: BudgetType;
   budgetMin: number;
   budgetMax: number;
   experienceLevel: ExperienceLevel;
+  deadline?: string;
   status: JobStatus;
-  clientName: string;
   clientId: string;
+  clientName: string;
   applicantCount: number;
-  postedAt: string; // ISO date
+  createdAt: string;
+  isSaved?: boolean;
+}
+
+export interface JobListParams {
+  search?: string;
+  category?: JobCategory;
+  budgetType?: BudgetType;
+  experienceLevel?: ExperienceLevel;
+  minBudget?: number;
+  maxBudget?: number;
+  sortBy?: "newest" | "budget_asc" | "budget_desc";
+  page?: number;
+  limit?: number;
 }

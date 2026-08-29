@@ -1,18 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Bookmark, MapPin, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { formatBudget, timeAgo } from "@/features/jobs/utils";
+import { experienceLevelLabels } from "@/types/enums";
+import {
+  formatBudget,
+  timeAgo,
+  categoryLabel,
+  getJobSkillNames,
+} from "@/features/jobs/utils";
+import { useAuth } from "@/hooks/use-auth";
+import { useSaveJob, useUnsaveJob } from "@/hooks/use-jobs";
 import type { Job } from "@/types/job";
 
 export function JobCard({ job }: { job: Job }) {
-  const [saved, setSaved] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const saveJob = useSaveJob();
+  const unsaveJob = useUnsaveJob();
+
+  const canSave = isAuthenticated && user?.role === "FREELANCER";
+  const isPending = saveJob.isPending || unsaveJob.isPending;
+  const skillNames = getJobSkillNames(job);
+
+  async function toggleSave(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!canSave) {
+      toast.info("Log in as a freelancer to save jobs.");
+      return;
+    }
+    try {
+      if (job.isSaved) {
+        await unsaveJob.mutateAsync(job.id);
+      } else {
+        await saveJob.mutateAsync(job.id);
+      }
+    } catch {
+      // toasted globally
+    }
+  }
 
   return (
     <motion.div
@@ -29,18 +60,19 @@ export function JobCard({ job }: { job: Job }) {
               </h3>
             </Link>
             <p className="text-text-secondary mt-1 text-xs">
-              {job.clientName} · {timeAgo(job.postedAt)}
+              {job.clientName} · {timeAgo(job.createdAt)}
             </p>
           </div>
           <button
-            onClick={() => setSaved((v) => !v)}
-            aria-label={saved ? "Unsave job" : "Save job"}
-            className="text-text-secondary hover:text-brand-600 shrink-0"
+            onClick={toggleSave}
+            disabled={isPending}
+            aria-label={job.isSaved ? "Unsave job" : "Save job"}
+            className="text-text-secondary hover:text-brand-600 shrink-0 disabled:opacity-50"
           >
             <Bookmark
               className={cn(
                 "h-5 w-5",
-                saved && "fill-brand-600 text-brand-600",
+                job.isSaved && "fill-brand-600 text-brand-600",
               )}
             />
           </button>
@@ -51,9 +83,9 @@ export function JobCard({ job }: { job: Job }) {
         </p>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {job.skills.slice(0, 4).map((skill) => (
-            <Badge key={skill} variant="neutral">
-              {skill}
+          {skillNames.slice(0, 4).map((name) => (
+            <Badge key={name} variant="neutral">
+              {name}
             </Badge>
           ))}
         </div>
@@ -69,12 +101,10 @@ export function JobCard({ job }: { job: Job }) {
             </span>
             <span className="flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5" />
-              {job.experienceLevel}
+              {experienceLevelLabels[job.experienceLevel]}
             </span>
           </div>
-          <Badge variant={job.status === "OPEN" ? "success" : "neutral"}>
-            {job.status}
-          </Badge>
+          <Badge variant="neutral">{categoryLabel(job)}</Badge>
         </div>
       </Card>
     </motion.div>

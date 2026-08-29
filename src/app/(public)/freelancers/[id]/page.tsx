@@ -109,9 +109,7 @@ export default function FreelancerPublicProfilePage() {
       <Card className="mt-6">
         <h3>Reviews</h3>
         <div className="mt-4">
-          {/* <ReviewList userId={params.id} /> */}
-
-          <p className="text-center"> You need to fix this! </p>
+          <ReviewList userId={params.id} />
         </div>
       </Card>
     </div>

@@ -3,8 +3,8 @@
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import type { ExperienceLevel, JobCategory } from "@/types/job";
+import { experienceLevelLabels, jobCategoryLabels } from "@/types/enums";
+import type { ExperienceLevel, JobCategory } from "@/types/enums";
 
 export interface JobFiltersState {
   category: JobCategory | "ALL";
@@ -18,16 +18,11 @@ interface JobFiltersProps {
   onReset: () => void;
 }
 
-const categories: JobCategory[] = [
-  "Web Development",
-  "Mobile Development",
-  "Design",
-  "Writing",
-  "Marketing",
-  "Data Science",
-];
-
-const experienceLevels: ExperienceLevel[] = ["Entry", "Intermediate", "Expert"];
+export const defaultJobFilters: JobFiltersState = {
+  category: "ALL",
+  experienceLevel: "ALL",
+  minBudget: "",
+};
 
 export function JobFilters({ filters, onChange, onReset }: JobFiltersProps) {
   return (
@@ -55,9 +50,9 @@ export function JobFilters({ filters, onChange, onReset }: JobFiltersProps) {
           }
         >
           <option value="ALL">All categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
+          {Object.entries(jobCategoryLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
             </option>
           ))}
         </Select>
@@ -77,9 +72,9 @@ export function JobFilters({ filters, onChange, onReset }: JobFiltersProps) {
           }
         >
           <option value="ALL">Any level</option>
-          {experienceLevels.map((l) => (
-            <option key={l} value={l}>
-              {l}
+          {Object.entries(experienceLevelLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
             </option>
           ))}
         </Select>
@@ -99,9 +94,3 @@ export function JobFilters({ filters, onChange, onReset }: JobFiltersProps) {
     </div>
   );
 }
-
-export const defaultJobFilters: JobFiltersState = {
-  category: "ALL",
-  experienceLevel: "ALL",
-  minBudget: "",
-};
