@@ -26,6 +26,7 @@ export function PortfolioSection({
 }: {
   portfolio: PortfolioItem[];
 }) {
+  const items = PortfolioSection ?? [];
   const [isAdding, setIsAdding] = useState(false);
   const addPortfolio = useAddPortfolio();
   const removePortfolio = useRemovePortfolio();

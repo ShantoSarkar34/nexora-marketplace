@@ -13,26 +13,35 @@ import type {
   Skill,
 } from "@/types/profile";
 
+function normalizeFreelancerProfile(raw: FreelancerProfile): FreelancerProfile {
+  return {
+    ...raw,
+    skills: raw.skills ?? [],
+    experience: raw.experience ?? [],
+    portfolio: raw.portfolio ?? [],
+  };
+}
+
 export const freelancerProfileService = {
   getMe: async () => {
     const res = await apiClient.get<FreelancerProfile>(
       "/profiles/freelancer/me",
     );
-    return res.data;
+    return normalizeFreelancerProfile(res.data);
   },
   create: async (payload: FreelancerBasicsValues) => {
     const res = await apiClient.post<FreelancerProfile>(
       "/profiles/freelancer",
       payload,
     );
-    return res.data;
+    return normalizeFreelancerProfile(res.data);
   },
   update: async (payload: Partial<FreelancerBasicsValues>) => {
     const res = await apiClient.patch<FreelancerProfile>(
       "/profiles/freelancer/me",
       payload,
     );
-    return res.data;
+    return normalizeFreelancerProfile(res.data);
   },
   addSkill: async (name: string) => {
     const res = await apiClient.post<Skill>("/profiles/freelancer/skills", {
@@ -71,7 +80,12 @@ export const freelancerProfileService = {
     const res = await apiClient.get<
       FreelancerProfile & { name: string; avatarInitials?: string }
     >(`/profiles/freelancer/${userId}`);
-    return res.data;
+    return {
+      ...res.data,
+      skills: res.data.skills ?? [],
+      experience: res.data.experience ?? [],
+      portfolio: res.data.portfolio ?? [],
+    };
   },
 };
 

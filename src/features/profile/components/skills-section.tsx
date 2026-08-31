@@ -12,6 +12,7 @@ import { useAddSkill, useRemoveSkill } from "@/hooks/use-freelancer-profile";
 import type { Skill } from "@/types/profile";
 
 export function SkillsSection({ skills }: { skills: Skill[] }) {
+  const items = skills ?? [];
   const [newSkill, setNewSkill] = useState("");
   const addSkill = useAddSkill();
   const removeSkill = useRemoveSkill();
@@ -43,12 +44,12 @@ export function SkillsSection({ skills }: { skills: Skill[] }) {
     <Card>
       <h3>Skills</h3>
       <div className="mt-4 flex flex-wrap gap-2">
-        {skills.length === 0 ? (
+        {items.length === 0 ? (
           <p className="text-text-secondary text-sm">
             No skills added yet — add your first one below.
           </p>
         ) : (
-          skills.map((skill) => (
+          items.map((skill) => (
             <Badge key={skill.id} variant="brand" className="gap-1.5 pr-1.5">
               {skill.name}
               <button

@@ -40,6 +40,7 @@ export function ExperienceSection({
 }: {
   experience: Experience[];
 }) {
+  const items =experience ?? [];
   const [isAdding, setIsAdding] = useState(false);
   const addExperience = useAddExperience();
   const removeExperience = useRemoveExperience();
@@ -91,7 +92,7 @@ export function ExperienceSection({
       </div>
 
       <div className="mt-4 space-y-5">
-        {experience.map((exp) => (
+        {items.map((exp) => (
           <div
             key={exp.id}
             className="border-border flex justify-between gap-3 border-b pb-4 last:border-0 last:pb-0"
@@ -119,7 +120,7 @@ export function ExperienceSection({
             </button>
           </div>
         ))}
-        {experience.length === 0 && !isAdding && (
+        {items.length === 0 && !isAdding && (
           <p className="text-text-secondary text-sm">
             No experience added yet.
           </p>
