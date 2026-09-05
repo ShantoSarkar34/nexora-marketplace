@@ -17,6 +17,7 @@ import {
   useContract,
   useRequestRevision,
 } from "@/hooks/use-contracts";
+import { PayNowButton } from "@/features/payments/components/pay-now-button";
 
 export default function ClientContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -118,10 +119,16 @@ export default function ClientContractDetailsPage() {
         </Alert>
       )}
 
-      {(contract.status === "PENDING" || contract.status === "ACTIVE") && (
-        <Button variant="destructive" onClick={() => setCancelOpen(true)}>
-          Cancel Contract
-        </Button>
+      {contract.status === "PENDING" && (
+        <Alert variant="info">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>
+              This contract is pending payment. Complete payment to activate it
+              and let {contract.freelancerName} begin work.
+            </span>
+            <PayNowButton contractId={contract.id} />
+          </div>
+        </Alert>
       )}
 
       <CancelContractDialog

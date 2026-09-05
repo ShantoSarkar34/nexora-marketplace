@@ -1,5 +1,4 @@
-export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED";
-export type PaymentMethod = "STRIPE" | "BKASH";
+import type { PaymentStatus } from "@/types/enums";
 
 export interface Payment {
   id: string;
@@ -7,7 +6,11 @@ export interface Payment {
   jobTitle: string;
   freelancerName: string;
   amount: number;
-  method: PaymentMethod;
   status: PaymentStatus;
   createdAt: string;
+}
+
+export interface CheckoutResponse {
+  checkoutUrl: string;
+  payment: Payment;
 }
