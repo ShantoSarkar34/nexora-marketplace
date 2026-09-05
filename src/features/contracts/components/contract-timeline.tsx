@@ -1,10 +1,10 @@
 import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { ContractStatus } from "@/types/contract";
+import type { ContractStatus } from "@/types/enums";
 
 const steps: { key: ContractStatus; label: string }[] = [
-  { key: "PENDING", label: "Pending" },
+  { key: "PENDING", label: "Pending Payment" },
   { key: "ACTIVE", label: "Active" },
   { key: "SUBMITTED", label: "Submitted" },
   { key: "COMPLETED", label: "Completed" },

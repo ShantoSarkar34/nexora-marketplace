@@ -85,9 +85,7 @@ function ClientApplicationsContent() {
                       {getInitials(app.freelancerName)}
                     </span>
                     <div>
-                      <p className="text-text-primary text-sm font-semibold">
-                        {app.freelancerName}
-                      </p>
+                      <p className="text-sm font-semibold text-text-primary">{app.freelancerName || "Unknown Freelancer"}</p>
                       <p className="text-text-secondary text-xs">
                         Proposed ${app.proposedBudget}
                       </p>

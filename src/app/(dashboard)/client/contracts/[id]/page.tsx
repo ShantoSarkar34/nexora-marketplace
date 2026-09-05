@@ -1,30 +1,55 @@
 "use client";
 
 import { useParams, notFound } from "next/navigation";
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
+import { Spinner } from "@/components/ui/spinner";
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
 import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
-import { ReviewForm } from "@/features/reviews/components/review-form";
-import { mockContracts } from "@/lib/mock-data/contracts";
-import type { ContractStatus } from "@/types/contract";
+import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
+import {
+  useApproveWork,
+  useContract,
+  useRequestRevision,
+} from "@/hooks/use-contracts";
 
 export default function ClientContractDetailsPage() {
   const params = useParams<{ id: string }>();
-  const contract = mockContracts.find((c) => c.id === params.id);
-  const [status, setStatus] = useState<ContractStatus | null>(null);
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const { data: contract, isLoading, isError } = useContract(params.id);
+  const approveWork = useApproveWork();
+  const requestRevision = useRequestRevision();
+  const [cancelOpen, setCancelOpen] = useState(false);
 
-  if (!contract) notFound();
-  const currentStatus = status ?? contract.status;
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="h-8 w-8" />
+      </div>
+    );
+  }
+  if (isError || !contract) notFound();
 
-  function approveWork() {
-    // Track B: replace with real API call -> services/contracts.ts:approveWork(contract!.id)
-    setStatus("COMPLETED");
+  async function handleApprove() {
+    try {
+      await approveWork.mutateAsync(contract!.id);
+      toast.success("Work approved — contract completed!");
+    } catch {
+      // toasted globally
+    }
+  }
+
+  async function handleRequestRevision() {
+    try {
+      await requestRevision.mutateAsync(contract!.id);
+      toast.success("Revision requested — contract set back to active.");
+    } catch {
+      // toasted globally
+    }
   }
 
   return (
@@ -32,50 +57,78 @@ export default function ClientContractDetailsPage() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1>{contract.jobTitle}</h1>
-          <p className="mt-1 text-text-secondary">{contract.freelancerName}</p>
+          <p className="text-text-secondary mt-1">{contract.freelancerName}</p>
         </div>
-        <ContractStatusBadge status={currentStatus} />
+        <ContractStatusBadge status={contract.status} />
       </div>
 
       <Card>
-        <ContractTimeline status={currentStatus} />
+        <ContractTimeline status={contract.status} />
       </Card>
 
-      {currentStatus === "PENDING" && (
+      {contract.status === "PENDING" && (
         <Alert variant="info">
-          This contract is pending payment. Complete payment to activate it.{" "}
-          <Link href="/client/payments" className="font-medium underline">
+          This contract is pending payment. Complete payment to activate it and
+          let {contract.freelancerName} begin work.{" "}
+          <Link
+            href={`/client/payments?contractId=${contract.id}`}
+            className="font-medium underline"
+          >
             Go to Payments
           </Link>
         </Alert>
       )}
 
-      {/* Status-based action: a client only sees Approve Work once SUBMITTED */}
-      {currentStatus === "SUBMITTED" && (
+      {contract.status === "SUBMITTED" && (
         <Card>
           <h3>Submitted work</h3>
-          <p className="mt-2 text-sm text-text-secondary">
-            {contract.workSubmissionNote}
-          </p>
-          <Button className="mt-4" onClick={approveWork}>
-            Approve Work
-          </Button>
+          {contract.submissionNote && (
+            <p className="text-text-secondary mt-2 text-sm">
+              {contract.submissionNote}
+            </p>
+          )}
+          {contract.submissionUrl && (
+            <a
+              href={contract.submissionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-600 mt-2 block text-sm font-medium"
+            >
+              View submitted work →
+            </a>
+          )}
+          <div className="mt-4 flex gap-2">
+            <Button onClick={handleApprove} isLoading={approveWork.isPending}>
+              Approve Work
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleRequestRevision}
+              isLoading={requestRevision.isPending}
+            >
+              Request Revision
+            </Button>
+          </div>
         </Card>
       )}
 
-      {currentStatus === "COMPLETED" && !reviewSubmitted && (
-        <Card>
-          <h3>Leave a review for {contract.freelancerName}</h3>
-          <ReviewForm
-            targetName={contract.freelancerName}
-            onSubmit={() => setReviewSubmitted(true)}
-          />
-        </Card>
+      {contract.status === "COMPLETED" && (
+        <Alert variant="success">
+          This contract is complete. You can leave a review from here soon.
+        </Alert>
       )}
 
-      {currentStatus === "COMPLETED" && reviewSubmitted && (
-        <Alert variant="success">Thanks — your review has been submitted.</Alert>
+      {(contract.status === "PENDING" || contract.status === "ACTIVE") && (
+        <Button variant="destructive" onClick={() => setCancelOpen(true)}>
+          Cancel Contract
+        </Button>
       )}
+
+      <CancelContractDialog
+        contractId={contract.id}
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+      />
     </div>
   );
 }

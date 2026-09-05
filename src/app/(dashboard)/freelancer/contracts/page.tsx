@@ -4,13 +4,13 @@ import Link from "next/link";
 import { Briefcase } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
-import { mockContracts } from "@/lib/mock-data/contracts";
+import { useMyContracts } from "@/hooks/use-contracts";
 
 export default function FreelancerContractsPage() {
-  // Track B: replace with GET /contracts?freelancerId=me
-  const contracts = mockContracts;
+  const { data: contracts, isLoading } = useMyContracts();
 
   return (
     <div className="space-y-6">
@@ -21,7 +21,11 @@ export default function FreelancerContractsPage() {
         </p>
       </div>
 
-      {contracts.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center py-16">
+          <Spinner className="h-8 w-8" />
+        </div>
+      ) : !contracts || contracts.length === 0 ? (
         <EmptyState
           icon={<Briefcase className="h-6 w-6" />}
           title="No contracts yet"
@@ -38,7 +42,8 @@ export default function FreelancerContractsPage() {
                       {c.jobTitle}
                     </h3>
                     <p className="text-text-secondary mt-1 text-xs">
-                      {c.clientName} · Started {c.startedAt}
+                      {c.clientName} · Started{" "}
+                      {new Date(c.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <ContractStatusBadge status={c.status} />
@@ -47,6 +52,11 @@ export default function FreelancerContractsPage() {
                   ${c.budget}
                   {c.budgetType === "HOURLY" ? "/hr" : " fixed"}
                 </p>
+                {c.status === "PENDING" && (
+                  <p className="text-status-pending mt-2 text-xs">
+                    Awaiting client payment to activate.
+                  </p>
+                )}
               </Card>
             </Link>
           ))}

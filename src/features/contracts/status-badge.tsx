@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import type { ContractStatus } from "@/types/contract";
+import { contractStatusLabels } from "@/types/enums";
+import type { ContractStatus } from "@/types/enums";
 
 const variantMap: Record<
   ContractStatus,
@@ -14,5 +15,7 @@ const variantMap: Record<
 };
 
 export function ContractStatusBadge({ status }: { status: ContractStatus }) {
-  return <Badge variant={variantMap[status]}>{status}</Badge>;
+  return (
+    <Badge variant={variantMap[status]}>{contractStatusLabels[status]}</Badge>
+  );
 }

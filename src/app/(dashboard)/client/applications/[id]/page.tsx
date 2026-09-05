@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, notFound } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
@@ -14,12 +14,14 @@ import {
   useApplication,
   useUpdateApplicationStatus,
 } from "@/hooks/use-applications";
+import { useHireFreelancer } from "@/hooks/use-contracts";
 
 export default function ApplicantDetailsPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const { data: application, isLoading, isError } = useApplication(params.id);
   const updateStatus = useUpdateApplicationStatus();
-  const [hireNotice, setHireNotice] = useState(false);
+  const hireFreelancer = useHireFreelancer();
 
   if (isLoading) {
     return (
@@ -54,6 +56,18 @@ export default function ApplicantDetailsPage() {
     }
   }
 
+  async function handleHire() {
+    try {
+      const contract = await hireFreelancer.mutateAsync(application!.id);
+      toast.success(
+        `${application!.freelancerName} hired! Complete payment to activate the contract.`,
+      );
+      router.push(`/client/contracts/${contract.id}`);
+    } catch {
+      // toasted globally (e.g. 409 if already hired for this job)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-3">
@@ -75,7 +89,8 @@ export default function ApplicantDetailsPage() {
 
       {application.status === "HIRED" && (
         <Alert variant="success">
-          You&apos;ve hired this applicant. Check your contracts to proceed.
+          You&apos;ve hired this applicant. Check your contracts to complete
+          payment.
         </Alert>
       )}
       {application.status === "REJECTED" && (
@@ -121,7 +136,9 @@ export default function ApplicantDetailsPage() {
               Shortlist
             </Button>
           )}
-          <Button onClick={() => setHireNotice(true)}>Hire Freelancer</Button>
+          <Button onClick={handleHire} isLoading={hireFreelancer.isPending}>
+            Hire Freelancer
+          </Button>
           <Button
             variant="destructive"
             onClick={handleReject}
@@ -130,13 +147,6 @@ export default function ApplicantDetailsPage() {
             Reject
           </Button>
         </div>
-      )}
-
-      {hireNotice && (
-        <Alert variant="info">
-          Hiring creates a contract and is handled from the Contracts section —
-          this is coming in the next build phase.
-        </Alert>
       )}
     </div>
   );
