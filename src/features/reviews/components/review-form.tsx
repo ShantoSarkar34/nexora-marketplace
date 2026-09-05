@@ -2,30 +2,49 @@
 
 import { useState } from "react";
 import { Star } from "lucide-react";
+import { toast } from "sonner";
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ApiError } from "@/lib/api-client";
+import { useSubmitReview } from "@/hooks/use-reviews";
 
 interface ReviewFormProps {
+  contractId: string;
   targetName: string;
-  onSubmit: () => void;
+  onSubmitted: () => void;
 }
 
-export function ReviewForm({ targetName, onSubmit }: ReviewFormProps) {
+export function ReviewForm({
+  contractId,
+  targetName,
+  onSubmitted,
+}: ReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitReview = useSubmitReview();
 
   async function handleSubmit() {
-    if (rating === 0 || !comment.trim()) return;
-    setIsSubmitting(true);
-    // Track B: replace with real API call -> services/reviews.ts:createReview({ rating, comment })
-    console.log("Review (mock):", { targetName, rating, comment });
-    await new Promise((resolve) => setTimeout(resolve, 700));
-    setIsSubmitting(false);
-    onSubmit();
+    if (rating === 0) {
+      toast.error("Please select a star rating.");
+      return;
+    }
+    try {
+      await submitReview.mutateAsync({
+        contractId,
+        values: { rating, comment: comment.trim() || undefined },
+      });
+      toast.success("Review submitted — thank you!");
+      onSubmitted();
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        toast.info("You've already reviewed this contract.");
+        onSubmitted();
+      }
+      // other errors toasted globally
+    }
   }
 
   return (
@@ -53,13 +72,14 @@ export function ReviewForm({ targetName, onSubmit }: ReviewFormProps) {
       </div>
       <Textarea
         rows={3}
-        placeholder={`Share your experience working with ${targetName}...`}
+        placeholder={`Share your experience working with ${targetName} (optional)...`}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
+        maxLength={1000}
       />
       <Button
         onClick={handleSubmit}
-        isLoading={isSubmitting}
+        isLoading={submitReview.isPending}
         disabled={rating === 0}
       >
         Submit Review

@@ -15,6 +15,7 @@ import { ContractStatusBadge } from "@/features/contracts/status-badge";
 import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
 import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
 import { useContract, useSubmitWork } from "@/hooks/use-contracts";
+import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
 
 export default function FreelancerContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -130,9 +131,10 @@ export default function FreelancerContractDetailsPage() {
       )}
 
       {contract.status === "COMPLETED" && (
-        <Alert variant="success">
-          This contract is complete. You can leave a review from here soon.
-        </Alert>
+        <ContractReviewSection
+          contractId={contract.id}
+          targetName={contract.clientName}
+        />
       )}
 
       {(contract.status === "PENDING" || contract.status === "ACTIVE") && (

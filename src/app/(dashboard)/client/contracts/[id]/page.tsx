@@ -18,6 +18,7 @@ import {
   useRequestRevision,
 } from "@/hooks/use-contracts";
 import { PayNowButton } from "@/features/payments/components/pay-now-button";
+import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
 
 export default function ClientContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -114,9 +115,10 @@ export default function ClientContractDetailsPage() {
       )}
 
       {contract.status === "COMPLETED" && (
-        <Alert variant="success">
-          This contract is complete. You can leave a review from here soon.
-        </Alert>
+        <ContractReviewSection
+          contractId={contract.id}
+          targetName={contract.freelancerName}
+        />
       )}
 
       {contract.status === "PENDING" && (

@@ -10,6 +10,7 @@ import { ReviewList } from "@/features/reviews/components/review-list";
 import { useQuery } from "@tanstack/react-query";
 import { freelancerProfileService } from "@/services/profile";
 import { getInitials } from "@/lib/get-initials";
+import { RatingSummary } from "@/features/reviews/components/rating-summary";
 
 export default function FreelancerPublicProfilePage() {
   const params = useParams<{ id: string }>();
@@ -43,6 +44,9 @@ export default function FreelancerPublicProfilePage() {
             <div>
               <h1 className="text-xl">{profile.name}</h1>
               <p className="text-text-secondary text-sm">{profile.title}</p>
+              <div className="mt-1">
+                <RatingSummary userId={params.id} />
+              </div>
             </div>
           </div>
           <p className="text-text-primary text-lg font-semibold">
