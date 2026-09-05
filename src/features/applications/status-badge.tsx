@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import type { ApplicationStatus } from "@/types/application";
+import { applicationStatusLabels } from "@/types/enums";
+import type { ApplicationStatus } from "@/types/enums";
 
 const variantMap: Record<
   ApplicationStatus,
@@ -17,5 +18,9 @@ export function ApplicationStatusBadge({
 }: {
   status: ApplicationStatus;
 }) {
-  return <Badge variant={variantMap[status]}>{status}</Badge>;
+  return (
+    <Badge variant={variantMap[status]}>
+      {applicationStatusLabels[status]}
+    </Badge>
+  );
 }
