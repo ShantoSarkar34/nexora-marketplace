@@ -1,7 +1,16 @@
-export interface AIMatchResult {
+export interface RuleBasedMatch {
   matchScore: number;
-  matchingSkills: string[];
+  breakdown: {
+    label: string;
+    score: number;
+    maxScore: number;
+  }[];
+}
+
+export interface AIAnalysis {
+  matchScore: number;
   strengths: string[];
   missingSkills: string[];
-  recommendations: string[];
+  recommendation: string;
+  updatedAt: string;
 }
