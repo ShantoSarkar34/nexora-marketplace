@@ -5,12 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, Check } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import { mockNotifications } from "@/lib/mock-data/notifications";
-import type { AppNotification } from "@/types/notification";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useNotifications,
+  useUnreadCount,
+} from "@/hooks/use-notifications";
+import { getNotificationLink } from "@/features/notifications/utils";
 
 function timeAgo(iso: string) {
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return "just now";
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
@@ -19,11 +27,15 @@ function timeAgo(iso: string) {
 
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] =
-    useState<AppNotification[]>(mockNotifications);
   const ref = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const { data: unreadCount = 0 } = useUnreadCount(!!user);
+  const { data, isLoading } = useNotifications({ limit: 10 });
+  const markRead = useMarkNotificationRead();
+  const markAllRead = useMarkAllNotificationsRead();
+
+  const notifications = data?.notifications ?? [];
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -34,17 +46,7 @@ export function NotificationDropdown() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  function markAllRead() {
-    // Track B: replace with real API call -> services/notifications.ts:markAllRead()
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  }
-
-  function markRead(id: string) {
-    // Track B: replace with real API call -> services/notifications.ts:markRead(id)
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
-  }
+  if (!user) return null;
 
   return (
     <div className="relative" ref={ref}>
@@ -56,7 +58,7 @@ export function NotificationDropdown() {
         <Bell className="h-4.5 w-4.5" />
         {unreadCount > 0 && (
           <span className="bg-status-error absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold text-white">
-            {unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
@@ -76,8 +78,9 @@ export function NotificationDropdown() {
               </p>
               {unreadCount > 0 && (
                 <button
-                  onClick={markAllRead}
-                  className="text-brand-600 flex items-center gap-1 text-xs font-medium"
+                  onClick={() => markAllRead.mutate()}
+                  disabled={markAllRead.isPending}
+                  className="text-brand-600 flex items-center gap-1 text-xs font-medium disabled:opacity-50"
                 >
                   <Check className="h-3 w-3" />
                   Mark all read
@@ -86,7 +89,11 @@ export function NotificationDropdown() {
             </div>
 
             <div className="max-h-80 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {isLoading ? (
+                <div className="flex justify-center py-6">
+                  <Spinner className="h-5 w-5" />
+                </div>
+              ) : notifications.length === 0 ? (
                 <p className="text-text-secondary p-4 text-center text-sm">
                   No notifications
                 </p>
@@ -94,9 +101,9 @@ export function NotificationDropdown() {
                 notifications.map((n) => (
                   <Link
                     key={n.id}
-                    href={n.link ?? "#"}
+                    href={getNotificationLink(n, user.role)}
                     onClick={() => {
-                      markRead(n.id);
+                      if (!n.isRead) markRead.mutate(n.id);
                       setIsOpen(false);
                     }}
                     className={cn(
