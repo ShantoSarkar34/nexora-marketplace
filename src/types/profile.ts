@@ -1,3 +1,12 @@
+export interface SkillRelation {
+  id: string;
+  skillId: string;
+  skill: {
+    id: string;
+    name: string;
+  };
+}
+
 export interface Skill {
   id: string;
   name: string;

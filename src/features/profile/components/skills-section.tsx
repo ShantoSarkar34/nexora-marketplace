@@ -20,7 +20,7 @@ export function SkillsSection({ skills }: { skills: Skill[] }) {
   async function handleAdd() {
     const trimmed = newSkill.trim();
     if (!trimmed) return;
-    if (skills.some((s) => s.name.toLowerCase() === trimmed.toLowerCase())) {
+    if (skills.some((s) => s.name?.toLowerCase() === trimmed.toLowerCase())) {
       setNewSkill("");
       return;
     }

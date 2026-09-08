@@ -1,9 +1,15 @@
 import { z } from "zod";
 
 export const freelancerBasicsSchema = z.object({
+  name: z.string().min(2, "Name is required"),
   title: z.string().min(3, "Title is required"),
   bio: z.string().min(20, "Bio should be at least 20 characters"),
   hourlyRate: z.coerce.number().positive("Enter a valid rate"),
+  avatarUrl: z
+    .string()
+    .url("Enter a valid image URL")
+    .optional()
+    .or(z.literal("")),
 });
 export type FreelancerBasicsInput = z.input<typeof freelancerBasicsSchema>;
 export type FreelancerBasicsValues = z.output<typeof freelancerBasicsSchema>;

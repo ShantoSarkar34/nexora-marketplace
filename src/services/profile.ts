@@ -13,38 +13,38 @@ import type {
   Skill,
 } from "@/types/profile";
 
-function normalizeFreelancerProfile(raw: FreelancerProfile): FreelancerProfile {
+function normalizeFreelancerProfile(raw: any): FreelancerProfile {
   return {
-    ...raw,
-    skills: raw.skills ?? [],
-    experience: raw.experience ?? [],
-    portfolio: raw.portfolio ?? [],
+    id: raw.id,
+    userId: raw.userId,
+    title: raw.title ?? "",
+    bio: raw.bio ?? "",
+    hourlyRate: Number(raw.hourlyRate) || 0,
+    completionPercentage: raw.completionPercentage ?? 0,
+    skills: (raw.skills ?? []).map((s: any) => ({
+      id: s.skillId ?? s.skill?.id ?? s.id,
+      name: s.skill?.name ?? s.name ?? "",
+    })),
+    experience: raw.experiences ?? raw.experience ?? [],
+    portfolio: raw.portfolios ?? raw.portfolio ?? [],
   };
 }
 
 export const freelancerProfileService = {
   getMe: async () => {
-    const res = await apiClient.get<FreelancerProfile>(
-      "/profiles/freelancer/me",
-    );
+    const res = await apiClient.get<any>("/profiles/freelancer/me");
     return normalizeFreelancerProfile(res.data);
   },
   create: async (payload: FreelancerBasicsValues) => {
-    const res = await apiClient.post<FreelancerProfile>(
-      "/profiles/freelancer",
-      payload,
-    );
+    const res = await apiClient.post<any>("/profiles/freelancer", payload);
     return normalizeFreelancerProfile(res.data);
   },
   update: async (payload: Partial<FreelancerBasicsValues>) => {
-    const res = await apiClient.patch<FreelancerProfile>(
-      "/profiles/freelancer/me",
-      payload,
-    );
+    const res = await apiClient.patch<any>("/profiles/freelancer/me", payload);
     return normalizeFreelancerProfile(res.data);
   },
   addSkill: async (name: string) => {
-    const res = await apiClient.post<Skill>("/profiles/freelancer/skills", {
+    const res = await apiClient.post<any>("/profiles/freelancer/skills", {
       name,
     });
     return res.data;
@@ -77,14 +77,11 @@ export const freelancerProfileService = {
     );
   },
   getPublic: async (userId: string) => {
-    const res = await apiClient.get<
-      FreelancerProfile & { name: string; avatarInitials?: string }
-    >(`/profiles/freelancer/${userId}`);
+    const res = await apiClient.get<any>(`/profiles/freelancer/${userId}`);
     return {
-      ...res.data,
-      skills: res.data.skills ?? [],
-      experience: res.data.experience ?? [],
-      portfolio: res.data.portfolio ?? [],
+      ...normalizeFreelancerProfile(res.data),
+      name: res.data.name,
+      avatarInitials: res.data.avatarInitials,
     };
   },
 };
