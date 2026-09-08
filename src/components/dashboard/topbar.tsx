@@ -74,9 +74,17 @@ export function Topbar({ user, onMenuClick }: TopbarProps) {
             onClick={() => setMenuOpen((v) => !v)}
             className="hover:bg-surface-muted flex items-center gap-2 rounded-md py-1 pr-2 pl-1"
           >
-            <span className="bg-brand-100 text-brand-700 flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold">
-              {getInitials(user.name)}
-            </span>
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="h-8 w-8 rounded-full object-cover"
+              />
+            ) : (
+              <span className="bg-brand-100 text-brand-700 flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold">
+                {getInitials(user.name)}
+              </span>
+            )}
             <span className="text-text-primary hidden text-sm font-medium sm:block">
               {user.name}
             </span>

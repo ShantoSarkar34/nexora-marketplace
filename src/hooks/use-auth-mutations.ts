@@ -24,6 +24,15 @@ export function useRegister() {
   });
 }
 
+export function useUpdateMe() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { name?: string; avatarUrl?: string }) =>
+      authService.updateMe(payload),
+    onSuccess: (user) => qc.setQueryData(authQueryKey, user),
+  });
+}
+
 export function useLogout() {
   const qc = useQueryClient();
   return useMutation({

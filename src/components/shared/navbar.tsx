@@ -36,6 +36,8 @@ export function Navbar() {
     router.push("/");
   }
 
+  console.log(user)
+
   return (
     <header className="border-border bg-surface/80 sticky top-0 z-50 border-b backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -63,9 +65,17 @@ export function Navbar() {
             <div className="bg-surface-muted h-8 w-20 animate-pulse rounded-md" />
           ) : isAuthenticated && user ? (
             <>
-              <span className="bg-brand-100 text-brand-700 flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold">
-                {getInitials(user.name)}
-              </span>
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+              ) : (
+                <span className="bg-brand-100 text-brand-700 flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold">
+                  {getInitials(user.name)}
+                </span>
+              )}
               <Link href={dashboardHref}>
                 <Button variant="ghost" size="sm">
                   <LayoutDashboard className="mr-1.5 h-4 w-4" />

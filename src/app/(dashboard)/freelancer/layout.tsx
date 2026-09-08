@@ -1,16 +1,27 @@
+"use client";
+
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { freelancerNavItems } from "@/features/dashboard/nav-config";
-import { mockUsers } from "@/lib/mock-data/dashboard";
+import { useAuth } from "@/hooks/use-auth";
 
-// Track B: swap mockUsers.FREELANCER for the real authenticated user,
-// and add role + ownership checks (redirect non-freelancers away).
 export default function FreelancerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <DashboardShell navItems={freelancerNavItems} user={mockUsers.FREELANCER}>
+    <ProtectedRoute allowedRoles={["FREELANCER"]}>
+      <FreelancerShell>{children}</FreelancerShell>
+    </ProtectedRoute>
+  );
+}
+
+function FreelancerShell({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (!user) return null;
+  return (
+    <DashboardShell navItems={freelancerNavItems} user={user}>
       {children}
     </DashboardShell>
   );

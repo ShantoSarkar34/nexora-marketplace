@@ -26,6 +26,10 @@ export const authService = {
     const res = await apiClient.post<AuthUser>("/auth/register", payload);
     return res.data;
   },
+  updateMe: async (payload: { name?: string; avatarUrl?: string }) => {
+    const res = await apiClient.patch<AuthUser>("/auth/me", payload);
+    return res.data;
+  },
   logout: async () => {
     await apiClient.post<void>("/auth/logout");
   },
@@ -49,4 +53,3 @@ export const authService = {
     await apiClient.post<void>("/auth/reset-password", { token, newPassword });
   },
 };
-
