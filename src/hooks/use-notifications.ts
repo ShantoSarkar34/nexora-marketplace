@@ -2,26 +2,30 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useAuth } from "@/hooks/use-auth";
 import { notificationsService } from "@/services/notifications";
 
-const UNREAD_COUNT_POLL_MS = 30_000; 
+const UNREAD_COUNT_POLL_MS = 30_000;
 
 export function useUnreadCount(enabled: boolean) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["notifications", "unread-count"],
+    queryKey: ["notifications", "unread-count", user?.id],
     queryFn: notificationsService.unreadCount,
-    enabled,
+    enabled: enabled && !!user,
     refetchInterval: UNREAD_COUNT_POLL_MS,
-    refetchOnWindowFocus: true, 
+    refetchOnWindowFocus: true,
   });
 }
 
 export function useNotifications(
   params: { unreadOnly?: boolean; page?: number; limit?: number } = {},
 ) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["notifications", "list", params],
+    queryKey: ["notifications", "list", user?.id, params],
     queryFn: () => notificationsService.list(params),
+    enabled: !!user,
   });
 }
 
