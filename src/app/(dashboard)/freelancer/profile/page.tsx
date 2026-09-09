@@ -27,6 +27,7 @@ import {
   type FreelancerBasicsInput,
   type FreelancerBasicsValues,
 } from "@/features/profile/schemas";
+import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 
 export default function FreelancerProfilePage() {
   const { user } = useAuth();
@@ -70,6 +71,8 @@ export default function FreelancerProfilePage() {
       <SkillsSection skills={profile.skills} />
       <ExperienceSection experience={profile.experience} />
       <PortfolioSection portfolio={profile.portfolio} />
+      <PortfolioSection portfolio={profile.portfolio} />
+      {user && <ProfileReviewsSection userId={user.id} />}
     </div>
   );
 }

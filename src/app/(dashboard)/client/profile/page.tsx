@@ -23,6 +23,7 @@ import {
   type ClientBasicsInput,
   type ClientBasicsValues,
 } from "@/features/profile/schemas";
+import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 
 export default function ClientProfilePage() {
   const { user } = useAuth();
@@ -60,6 +61,8 @@ export default function ClientProfilePage() {
         </p>
       </div>
       {user && <ClientBasicsSection user={user} profile={profile} />}
+      {user && <ClientBasicsSection user={user} profile={profile} />}
+      {user && <ProfileReviewsSection userId={user.id} />}
     </div>
   );
 }
