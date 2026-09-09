@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { MatchPreviewCard } from "@/components/shared/match-preview-card";
 import { CountUp } from "@/components/shared/count-up";
-
-const stats = [
-  { label: "Active freelancers", value: 12400, suffix: "+" },
-  { label: "Jobs posted monthly", value: 3200, suffix: "+" },
-  { label: "Avg. match accuracy", value: 94, suffix: "%" },
-];
+import { JobCard } from "@/features/jobs/components/job-card";
+import { jobCategoryLabels } from "@/types/enums";
+import { useJobs } from "@/hooks/use-jobs";
 
 const freelancerSteps = [
   "Build a profile with real skills and portfolio work",
@@ -33,6 +32,10 @@ const fadeUp = {
 };
 
 export default function HomePage() {
+  const { data, isLoading } = useJobs({ sortBy: "newest", limit: 3, page: 1 });
+  const recentJobs = data?.jobs ?? [];
+  const totalOpenJobs = data?.meta?.total ?? 0;
+
   return (
     <div>
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8">
@@ -81,38 +84,70 @@ export default function HomePage() {
         <MatchPreviewCard />
       </section>
 
+      {totalOpenJobs > 0 && (
+        <section className="border-border bg-surface-muted border-y">
+          <div className="mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 lg:px-8">
+            <p className="text-brand-600 text-3xl font-bold">
+              <CountUp value={totalOpenJobs} suffix="+" />
+            </p>
+            <p className="text-text-secondary mt-1 text-sm">
+              Open jobs on Nexora right now
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Real, live jobs — not placeholder content */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <h2>Recently posted jobs</h2>
+          <Link
+            href="/jobs"
+            className="text-brand-600 flex items-center gap-1 text-sm font-medium"
+          >
+            Browse all <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="mt-8">
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Spinner className="h-8 w-8" />
+            </div>
+          ) : recentJobs.length === 0 ? (
+            <p className="text-text-secondary text-center text-sm">
+              No open jobs yet — check back soon.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {recentJobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Category quick links — real filter targets, not decoration */}
       <section className="border-border bg-surface-muted border-y">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-12 sm:grid-cols-3 sm:px-6 lg:px-8">
-          {stats.map((stat) => (
-            <motion.div
-              key={stat.label}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              variants={fadeUp}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
-              <p className="text-brand-600 text-3xl font-bold">
-                <CountUp value={stat.value} suffix={stat.suffix} />
-              </p>
-              <p className="text-text-secondary mt-1 text-sm">{stat.label}</p>
-            </motion.div>
-          ))}
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <h2 className="text-center">Browse by category</h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {Object.entries(jobCategoryLabels).map(([value, label]) => (
+              <Link
+                key={value}
+                href={`/jobs?category=${value}`}
+                className="border-border bg-surface text-text-primary hover:border-brand-500 hover:text-brand-600 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          How Nexora works
-        </motion.h2>
+        <h2 className="text-center">How Nexora works</h2>
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           <motion.div
             initial="hidden"

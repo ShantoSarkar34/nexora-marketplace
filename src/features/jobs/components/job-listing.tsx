@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useSearchParams } from "next/navigation";
 import { Search, SearchX } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -14,15 +14,23 @@ import {
   type JobFiltersState,
 } from "@/features/jobs/components/job-filters";
 import { Pagination } from "@/components/shared/pagination";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useJobs } from "@/hooks/use-jobs";
+import type { JobCategory } from "@/types/enums";
 import type { JobListParams } from "@/types/job";
 
 const PAGE_SIZE = 6;
 
 export function JobListing() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") as JobCategory | null;
+
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput, 400);
-  const [filters, setFilters] = useState<JobFiltersState>(defaultJobFilters);
+  const [filters, setFilters] = useState<JobFiltersState>({
+    ...defaultJobFilters,
+    category: initialCategory ?? "ALL",
+  });
   const [sortBy, setSortBy] = useState<JobListParams["sortBy"]>("newest");
   const [page, setPage] = useState(1);
 
