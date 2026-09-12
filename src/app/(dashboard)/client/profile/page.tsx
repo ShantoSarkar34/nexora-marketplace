@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CreateProfilePrompt } from "@/features/profile/components/create-profile-prompt";
 import { ClientBasicsSection } from "@/features/profile/components/client-basics-section";
+import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 import { useAuth } from "@/hooks/use-auth";
 import {
   useClientProfile,
@@ -23,7 +24,6 @@ import {
   type ClientBasicsInput,
   type ClientBasicsValues,
 } from "@/features/profile/schemas";
-import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 
 export default function ClientProfilePage() {
   const { user } = useAuth();
@@ -60,7 +60,6 @@ export default function ClientProfilePage() {
           This is how freelancers see your company when reviewing your jobs.
         </p>
       </div>
-      {user && <ClientBasicsSection user={user} profile={profile} />}
       {user && <ClientBasicsSection user={user} profile={profile} />}
       {user && <ProfileReviewsSection userId={user.id} />}
     </div>
