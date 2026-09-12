@@ -8,58 +8,77 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { apiClient } from "@/lib/api-client";
+import { paymentsService } from "@/services/payments";
 import type { Payment } from "@/types/payment";
 
-const POLL_INTERVAL_MS = 2000;
-const MAX_ATTEMPTS = 15; // ~30 seconds total
+const MAX_ATTEMPTS = 5;
+const RETRY_DELAY_MS = 1500;
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const [status, setStatus] = useState<"polling" | "success" | "timeout">(
-    "polling",
-  );
+  const [status, setStatus] = useState<
+    "verifying" | "success" | "pending" | "error"
+  >("verifying");
   const [payment, setPayment] = useState<Payment | null>(null);
 
   useEffect(() => {
-    let attempts = 0;
-    let cancelled = false;
-
-    async function poll() {
-      // Track: session_id from Stripe doesn't directly map to a lookup
-      // endpoint in the doc, so we rely on the most recent payment for the
-      // logged-in user instead. Adjust here if the backend later exposes a
-      // GET /payments/session/:sessionId lookup.
-      try {
-        const res = await apiClient.get<Payment[]>("/payments/me?limit=1");
-        const latest = res.data[0];
-        if (latest && latest.status === "SUCCESS") {
-          if (!cancelled) {
-            setPayment(latest);
-            setStatus("success");
-          }
-          return;
-        }
-      } catch {
-        // keep polling despite transient errors
-      }
-
-      attempts += 1;
-      if (attempts >= MAX_ATTEMPTS) {
-        if (!cancelled) setStatus("timeout");
-        return;
-      }
-      if (!cancelled) setTimeout(poll, POLL_INTERVAL_MS);
+    if (!sessionId) {
+      setStatus("error");
+      return;
     }
 
-    poll();
+    let cancelled = false;
+
+    async function verify(attempt = 1) {
+      try {
+        const result = await paymentsService.verifySession(sessionId!);
+        if (cancelled) return;
+
+        if (result.status === "SUCCESS") {
+          setPayment(result);
+          setStatus("success");
+          return;
+        }
+
+        if (attempt < MAX_ATTEMPTS) {
+          setTimeout(() => verify(attempt + 1), RETRY_DELAY_MS);
+        } else {
+          setStatus("pending");
+        }
+      } catch {
+        if (cancelled) return;
+        if (attempt < MAX_ATTEMPTS) {
+          setTimeout(() => verify(attempt + 1), RETRY_DELAY_MS);
+        } else {
+          setStatus("pending");
+        }
+      }
+    }
+
+    verify();
     return () => {
       cancelled = true;
     };
   }, [sessionId]);
 
-  if (status === "polling") {
+  if (status === "error") {
+    return (
+      <Card className="mx-auto max-w-md text-center">
+        <XCircle className="text-status-error mx-auto h-10 w-10" />
+        <h2 className="mt-3">Missing payment session</h2>
+        <p className="text-text-secondary mt-2 text-sm">
+          We couldn&apos;t find a payment session to verify. If you completed a
+          payment, check your contracts — it should reflect there shortly.
+        </p>
+        <Link href="/client/contracts">
+          <Button className="mt-5">View Contracts</Button>
+        </Link>
+      </Card>
+    );
+  }
+
+  if (status === "verifying") {
     return (
       <Card className="mx-auto max-w-md text-center">
         <Spinner className="mx-auto h-8 w-8" />
@@ -71,14 +90,15 @@ function SuccessContent() {
     );
   }
 
-  if (status === "timeout") {
+  if (status === "pending") {
     return (
       <Card className="mx-auto max-w-md text-center">
         <XCircle className="text-status-pending mx-auto h-10 w-10" />
         <h2 className="mt-3">Still processing</h2>
         <p className="text-text-secondary mt-2 text-sm">
           Your payment is taking longer than expected to confirm. Check your
-          contracts in a moment — it should update shortly.
+          contracts in a moment — it should update shortly once Stripe finishes
+          processing.
         </p>
         <Link href="/client/contracts">
           <Button className="mt-5">View Contracts</Button>
@@ -95,9 +115,15 @@ function SuccessContent() {
         {payment ? `Payment of $${payment.amount} received. ` : ""}
         The contract is now active.
       </p>
-      <Link href="/client/contracts">
-        <Button className="mt-5">View Contracts</Button>
-      </Link>
+      {payment?.contractId ? (
+        <Link href={`/client/contracts/${payment.contractId}`}>
+          <Button className="mt-5">View Contract</Button>
+        </Link>
+      ) : (
+        <Link href="/client/contracts">
+          <Button className="mt-5">View Contracts</Button>
+        </Link>
+      )}
     </Card>
   );
 }

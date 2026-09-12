@@ -20,6 +20,10 @@ export const paymentsService = {
     );
     return res.data;
   },
+  verifySession: async (sessionId: string) => {
+    const res = await apiClient.get<Payment>(`/payments/verify/${sessionId}`);
+    return res.data;
+  },
   getForContract: async (contractId: string) => {
     const res = await apiClient.get<Payment>(
       `/payments/contract/${contractId}`,
