@@ -15,6 +15,8 @@ import { CreateProfilePrompt } from "@/features/profile/components/create-profil
 import { ClientBasicsSection } from "@/features/profile/components/client-basics-section";
 import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 import { useAuth } from "@/hooks/use-auth";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import {
   useClientProfile,
   useCreateClientProfile,
@@ -54,11 +56,21 @@ export default function ClientProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1>Company Profile</h1>
-        <p className="text-text-secondary mt-1">
-          This is how freelancers see your company when reviewing your jobs.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1>Company Profile</h1>
+          <p className="text-text-secondary mt-1">
+            This is how freelancers see your company when reviewing your jobs.
+          </p>
+        </div>
+        {user && (
+          <Link href={`/clients/${user.id}`} target="_blank">
+            <Button variant="secondary" size="sm">
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+              View public profile
+            </Button>
+          </Link>
+        )}
       </div>
       {user && <ClientBasicsSection user={user} profile={profile} />}
       {user && <ProfileReviewsSection userId={user.id} />}

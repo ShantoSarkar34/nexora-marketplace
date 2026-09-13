@@ -19,6 +19,8 @@ import { ExperienceSection } from "@/features/profile/components/experience-sect
 import { PortfolioSection } from "@/features/profile/components/portfolio-section";
 import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 import { useAuth } from "@/hooks/use-auth";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import {
   useCreateFreelancerProfile,
   useFreelancerProfile,
@@ -58,11 +60,21 @@ export default function FreelancerProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1>My Profile</h1>
-        <p className="text-text-secondary mt-1">
-          This is how clients see you when reviewing applications.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1>My Profile</h1>
+          <p className="text-text-secondary mt-1">
+            This is how clients see you when reviewing applications.
+          </p>
+        </div>
+        {user && (
+          <Link href={`/freelancers/${user.id}`} target="_blank">
+            <Button variant="secondary" size="sm">
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+              View public profile
+            </Button>
+          </Link>
+        )}
       </div>
 
       <ProfileCompletionCard percentage={profile.completionPercentage} />

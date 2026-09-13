@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
+import { getInitials } from "@/lib/get-initials";
 import { useMyContracts } from "@/hooks/use-contracts";
 
 export default function ClientContractsPage() {
@@ -37,16 +38,32 @@ export default function ClientContractsPage() {
             <Link key={c.id} href={`/client/contracts/${c.id}`}>
               <Card className="hover:border-brand-300 transition-colors">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-text-primary text-base font-semibold">
-                      {c.jobTitle}
-                    </h3>
-                    <p className="text-text-secondary mt-1 text-xs">
-                      {c.freelancerName} · Started{" "}
-                      {new Date(c.createdAt).toLocaleDateString()}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <span className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+                      {getInitials(c.freelancerName)}
+                    </span>
+                    <div>
+                      <h3 className="text-text-primary text-base font-semibold">
+                        {c.jobTitle}
+                      </h3>
+                      <p className="text-text-secondary mt-0.5 text-xs">
+                        Freelancer:{" "}
+                        <span className="text-text-primary font-medium">
+                          {c.freelancerName}
+                        </span>
+                      </p>
+                      <p className="text-text-secondary text-xs">
+                        Started {new Date(c.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <ContractStatusBadge status={c.status} />
+                  <div className="flex flex-col items-end gap-1">
+                    <ContractStatusBadge status={c.status} />
+                    <span className="text-text-primary text-xs font-medium">
+                      ${c.budget}
+                      {c.budgetType === "HOURLY" ? "/hr" : " fixed"}
+                    </span>
+                  </div>
                 </div>
                 {c.status === "PENDING" && (
                   <p className="text-status-pending mt-2 text-xs">

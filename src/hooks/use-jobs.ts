@@ -105,7 +105,11 @@ export function useSaveJob() {
     mutationFn: (jobId: string) => jobsService.save(jobId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["jobs", "list"] });
-      qc.invalidateQueries({ queryKey: ["jobs", "saved"] });
+      qc.invalidateQueries({
+        queryKey: ["jobs", "saved"],
+        refetchType: "active",
+      });
+      qc.invalidateQueries({ queryKey: ["jobs", "detail"] });
     },
   });
 }
@@ -116,7 +120,11 @@ export function useUnsaveJob() {
     mutationFn: (jobId: string) => jobsService.unsave(jobId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["jobs", "list"] });
-      qc.invalidateQueries({ queryKey: ["jobs", "saved"] });
+      qc.invalidateQueries({
+        queryKey: ["jobs", "saved"],
+        refetchType: "active",
+      });
+      qc.invalidateQueries({ queryKey: ["jobs", "detail"] });
     },
   });
 }
