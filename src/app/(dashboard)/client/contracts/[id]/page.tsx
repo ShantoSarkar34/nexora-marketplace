@@ -19,6 +19,7 @@ import {
 } from "@/hooks/use-contracts";
 import { PayNowButton } from "@/features/payments/components/pay-now-button";
 import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
+import { ExternalLink } from "lucide-react";
 
 export default function ClientContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -59,7 +60,14 @@ export default function ClientContractDetailsPage() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1>{contract.jobTitle}</h1>
-          <p className="text-text-secondary mt-1">{contract.freelancerName}</p>
+          <p className="text-text-secondary mt-1">{contract.clientName}</p>
+          <Link
+            href={`/clients/${contract.clientId}`}
+            target="_blank"
+            className="text-brand-600 mt-1 flex items-center gap-1 text-xs font-medium"
+          >
+            View client profile <ExternalLink className="h-3 w-3" />
+          </Link>
         </div>
         <ContractStatusBadge status={contract.status} />
       </div>

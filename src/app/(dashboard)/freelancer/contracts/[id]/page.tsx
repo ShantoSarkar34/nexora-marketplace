@@ -16,6 +16,8 @@ import { ContractTimeline } from "@/features/contracts/components/contract-timel
 import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
 import { useContract, useSubmitWork } from "@/hooks/use-contracts";
 import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 export default function FreelancerContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -56,7 +58,14 @@ export default function FreelancerContractDetailsPage() {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1>{contract.jobTitle}</h1>
-          <p className="text-text-secondary mt-1">{contract.clientName}</p>
+          <p className="text-text-secondary mt-1">{contract.freelancerName}</p>
+          <Link
+            href={`/freelancers/${contract.freelancerId}`}
+            target="_blank"
+            className="text-brand-600 mt-1 flex items-center gap-1 text-xs font-medium"
+          >
+            View freelancer profile <ExternalLink className="h-3 w-3" />
+          </Link>
         </div>
         <ContractStatusBadge status={contract.status} />
       </div>

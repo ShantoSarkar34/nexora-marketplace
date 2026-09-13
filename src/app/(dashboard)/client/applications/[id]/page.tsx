@@ -14,6 +14,8 @@ import {
   useApplication,
   useUpdateApplicationStatus,
 } from "@/hooks/use-applications";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { useHireFreelancer } from "@/hooks/use-contracts";
 
 export default function ApplicantDetailsPage() {
@@ -82,6 +84,13 @@ export default function ApplicantDetailsPage() {
                 {application.freelancerTitle}
               </p>
             )}
+            <Link
+              href={`/freelancers/${application.freelancerId}`}
+              target="_blank"
+              className="text-brand-600 mt-1 flex items-center gap-1 text-xs font-medium"
+            >
+              View full profile <ExternalLink className="h-3 w-3" />
+            </Link>
           </div>
         </div>
         <ApplicationStatusBadge status={application.status} />
