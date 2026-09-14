@@ -65,9 +65,9 @@ export function Navbar() {
             <div className="bg-surface-muted h-8 w-20 animate-pulse rounded-md" />
           ) : isAuthenticated && user ? (
             <>
-              {user.avatarUrl ? (
+              {user.imageUrl ? (
                 <img
-                  src={user.avatarUrl}
+                  src={user.imageUrl}
                   alt={user.name}
                   className="h-8 w-8 rounded-full object-cover"
                 />

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getCroppedImageBlob } from "@/lib/crop-image";
+import { useUploadAvatar } from "@/hooks/use-auth-mutations";
 
 interface Props {
   open: boolean;
@@ -21,7 +22,7 @@ export function AvatarUploadDialog({ open, onOpenChange }: Props) {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const uploadAvatar = useUploadAvatar();
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -50,22 +51,18 @@ export function AvatarUploadDialog({ open, onOpenChange }: Props) {
 
   async function handleSave() {
     if (!imageSrc || !croppedAreaPixels) return;
-    setIsUploading(true);
     try {
-      // Produce the final cropped/rotated image client-side so it's ready
-      // to send the moment real upload is wired up.
-      await getCroppedImageBlob(imageSrc, croppedAreaPixels, rotation);
-
-      // TODO: send the blob to ImgBB (or your chosen host) once the upload
-      // endpoint/API key is configured, then PATCH /auth/me with the
-      // returned direct image URL.
-      toast.info("Image upload is currently unavailable — check back soon.");
+      const blob = await getCroppedImageBlob(
+        imageSrc,
+        croppedAreaPixels,
+        rotation,
+      );
+      await uploadAvatar.mutateAsync(blob);
+      toast.success("Profile photo updated!");
       reset();
       onOpenChange(false);
     } catch {
-      toast.error("Something went wrong processing the image.");
-    } finally {
-      setIsUploading(false);
+      toast.error("Couldn't upload the image. Please try again.");
     }
   }
 
@@ -147,7 +144,7 @@ export function AvatarUploadDialog({ open, onOpenChange }: Props) {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleSave} isLoading={isUploading}>
+            <Button onClick={handleSave} isLoading={uploadAvatar.isPending}>
               Save Photo
             </Button>
             <Button type="button" variant="secondary" onClick={reset}>

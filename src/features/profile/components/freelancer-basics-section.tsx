@@ -37,9 +37,9 @@ export function FreelancerBasicsSection({ user, profile }: Props) {
       renderView={() => (
         <div>
           <div className="flex items-center gap-3">
-            {user.avatarUrl ? (
+            {user.imageUrl ? (
               <img
-                src={user.avatarUrl}
+                src={user.imageUrl}
                 alt={user.name}
                 className="h-14 w-14 rounded-full object-cover"
               />
@@ -112,9 +112,9 @@ function BasicsForm({ user, profile, onDone }: Props & { onDone: () => void }) {
         <div>
           <Label>Profile photo</Label>
           <div className="mt-1.5 flex items-center gap-3">
-            {user.avatarUrl ? (
+            {user.imageUrl ? (
               <img
-                src={user.avatarUrl}
+                src={user.imageUrl}
                 alt={user.name}
                 className="h-14 w-14 rounded-full object-cover"
               />
