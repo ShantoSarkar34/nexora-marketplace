@@ -1,4 +1,5 @@
-import { apiClient } from "@/lib/api-client";
+import { apiClient, ApiError } from "@/lib/api-client";
+import { env } from "@/lib/env";
 import type { AuthUser, UserRole } from "@/types/user";
 
 export interface LoginPayload {
@@ -51,5 +52,28 @@ export const authService = {
   },
   resetPassword: async (token: string, newPassword: string) => {
     await apiClient.post<void>("/auth/reset-password", { token, newPassword });
+  },
+
+  uploadAvatar: async (blob: Blob) => {
+    const formData = new FormData();
+    formData.append("image", blob, "avatar.jpg");
+
+    const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/users/avatar`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new ApiError(
+        response.status,
+        payload?.message ?? "Failed to upload image",
+        payload?.errors,
+      );
+    }
+
+    return payload.data as { imageUrl: string };
   },
 };

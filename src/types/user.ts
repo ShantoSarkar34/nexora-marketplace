@@ -6,6 +6,6 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   isVerified: boolean;
-  avatarUrl?: string;
+  imageUrl?: string;
   createdAt: string;
 }

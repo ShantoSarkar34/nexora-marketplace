@@ -8,7 +8,7 @@ import {
   type LoginPayload,
   type RegisterPayload,
 } from "@/services/auth";
-import type { UserRole } from "@/types/user";
+import type { AuthUser, UserRole } from "@/types/user";
 
 export function useLogin() {
   const qc = useQueryClient();
@@ -80,5 +80,17 @@ export function useResetPassword() {
       token: string;
       newPassword: string;
     }) => authService.resetPassword(token, newPassword),
+  });
+}
+
+export function useUploadAvatar() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (blob: Blob) => authService.uploadAvatar(blob),
+    onSuccess: ({ imageUrl }) => {
+      qc.setQueryData(authQueryKey, (old: AuthUser | null | undefined) =>
+        old ? { ...old, imageUrl } : old,
+      );
+    },
   });
 }
