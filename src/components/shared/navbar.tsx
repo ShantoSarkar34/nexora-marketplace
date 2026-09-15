@@ -82,7 +82,7 @@ export function Navbar() {
                   Dashboard
                 </Button>
               </Link>
-              <Button
+              {/* <Button
                 variant="secondary"
                 size="sm"
                 onClick={handleLogout}
@@ -90,7 +90,7 @@ export function Navbar() {
               >
                 <LogOut className="mr-1.5 h-3.5 w-3.5" />
                 Log out
-              </Button>
+              </Button> */}
             </>
           ) : (
             <>
