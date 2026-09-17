@@ -19,7 +19,7 @@ export default function ClientDashboardLayout({
 
 function ClientShell({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  if (!user) return null;
+  if (!user) return null  
   return (
     <DashboardShell navItems={clientNavItems} user={user}>
       {children}

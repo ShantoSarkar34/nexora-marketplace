@@ -36,7 +36,7 @@ export function Navbar() {
     router.push("/");
   }
 
-  console.log(user)
+  console.log(user?.imageUrl)
 
   return (
     <header className="border-border bg-surface/80 sticky top-0 z-50 border-b backdrop-blur">

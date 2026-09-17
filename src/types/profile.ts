@@ -50,4 +50,8 @@ export interface ClientProfile {
   companySize?: string;
   website?: string;
   about?: string;
+  location?: string;
+  foundedYear?: number;
+  linkedinUrl?: string;
+  twitterUrl?: string;
 }

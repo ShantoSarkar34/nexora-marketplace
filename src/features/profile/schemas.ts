@@ -27,6 +27,15 @@ export const clientBasicsSchema = z.object({
     .min(20, "Description should be at least 20 characters")
     .optional()
     .or(z.literal("")),
+  location: z.string().optional().or(z.literal("")),
+  foundedYear: z.coerce
+    .number()
+    .int()
+    .min(1800, "Enter a valid year")
+    .max(new Date().getFullYear(), "Enter a valid year")
+    .optional(),
+  linkedinUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
+  twitterUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
 });
 export type ClientBasicsInput = z.input<typeof clientBasicsSchema>;
 export type ClientBasicsValues = z.output<typeof clientBasicsSchema>;
