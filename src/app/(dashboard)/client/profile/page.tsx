@@ -64,7 +64,7 @@ export default function ClientProfilePage() {
           </p>
         </div>
         {user && (
-          <Link href={`/clients/${user.id}`} target="_blank">
+          <Link href={`/clients/${user.id}`}>
             <Button variant="secondary" size="sm">
               <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
               View public profile

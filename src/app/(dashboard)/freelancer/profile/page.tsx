@@ -68,7 +68,7 @@ export default function FreelancerProfilePage() {
           </p>
         </div>
         {user && (
-          <Link href={`/freelancers/${user.id}`} target="_blank">
+          <Link href={`/freelancers/${user.id}`}>
             <Button variant="secondary" size="sm">
               <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
               View public profile
