@@ -1,3 +1,5 @@
+import { AuthUser } from "./user";
+
 export interface SkillRelation {
   id: string;
   skillId: string;
@@ -40,6 +42,7 @@ export interface FreelancerProfile {
   skills: Skill[];
   experience: Experience[];
   portfolio: PortfolioItem[];
+  user: AuthUser[]
 }
 
 export interface ClientProfile {
@@ -54,4 +57,5 @@ export interface ClientProfile {
   foundedYear?: number;
   linkedinUrl?: string;
   twitterUrl?: string;
+  user?:AuthUser[];
 }

@@ -25,6 +25,7 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
       id: s.skillId ?? s.skill?.id ?? s.id,
       name: s.skill?.name ?? s.name ?? "",
     })),
+    user: raw.user ?? raw.user ?? [],
     experience: raw.experiences ?? raw.experience ?? [],
     portfolio: raw.portfolios ?? raw.portfolio ?? [],
   };
