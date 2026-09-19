@@ -6,8 +6,10 @@ export interface Contract {
   jobTitle: string;
   clientId: string;
   clientName: string;
+  clientImageUrl?: string;
   freelancerId: string;
   freelancerName: string;
+  freelancerImageUrl?: string;
   budget: number;
   budgetType: BudgetType;
   status: ContractStatus;

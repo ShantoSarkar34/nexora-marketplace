@@ -8,8 +8,10 @@ export interface Application {
   jobTitle: string;
   clientId: string;
   clientName: string;
+  clientImageUrl?: string;
   freelancerId: string;
   freelancerName: string;
+  freelancerImageUrl?: string;
   freelancerTitle?: string;
   coverLetter: string;
   proposedBudget: number;
@@ -18,9 +20,6 @@ export interface Application {
   createdAt: string;
 }
 
-// The backend's raw shape may nest the freelancer/client/job under related
-// objects rather than flattening them. This normalizer accepts several
-// likely shapes so the rest of the app can rely on flat fields.
 function normalizeApplication(raw: any): Application {
   const freelancer = raw.freelancer ?? raw.applicant ?? raw.user ?? {};
   const job = raw.job ?? {};
@@ -33,9 +32,11 @@ function normalizeApplication(raw: any): Application {
     clientId: raw.clientId ?? client.id ?? "",
     clientName:
       raw.clientName ?? client.name ?? client.companyName ?? "Unknown Client",
+    clientImageUrl: raw.clientImageUrl ?? client.imageUrl,
     freelancerId: raw.freelancerId ?? freelancer.id ?? "",
     freelancerName:
       raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
+    freelancerImageUrl: raw.freelancerImageUrl ?? freelancer.imageUrl,
     freelancerTitle:
       raw.freelancerTitle ?? freelancer.title ?? freelancer.profile?.title,
     coverLetter: raw.coverLetter ?? "",
