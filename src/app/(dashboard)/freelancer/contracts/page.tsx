@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
 import { useMyContracts } from "@/hooks/use-contracts";
+import { Avatar } from "@/components/shared/avatar";
 
 export default function FreelancerContractsPage() {
   const { data: contracts, isLoading } = useMyContracts();
@@ -38,9 +39,22 @@ export default function FreelancerContractsPage() {
               <Card className="hover:border-brand-300 transition-colors">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-text-primary text-base font-semibold">
-                      {c.jobTitle}
-                    </h3>
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        name={c.clientName}
+                        imageUrl={c.clientImageUrl}
+                        accent="client"
+                      />
+                      <div>
+                        <h3 className="text-text-primary text-base font-semibold">
+                          {c.jobTitle}
+                        </h3>
+                        <p className="text-text-secondary mt-1 text-xs">
+                          {c.clientName} · Started{" `"}
+                          {new Date(c.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
                     <p className="text-text-secondary mt-1 text-xs">
                       {c.clientName} · Started{" "}
                       {new Date(c.createdAt).toLocaleDateString()}

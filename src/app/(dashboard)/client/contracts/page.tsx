@@ -7,11 +7,13 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
-import { getInitials } from "@/lib/get-initials";
 import { useMyContracts } from "@/hooks/use-contracts";
+import { Avatar } from "@/components/shared/avatar";
 
 export default function ClientContractsPage() {
   const { data: contracts, isLoading } = useMyContracts();
+
+  // console.log(contracts)
 
   return (
     <div className="space-y-6">
@@ -39,9 +41,7 @@ export default function ClientContractsPage() {
               <Card className="hover:border-brand-300 transition-colors">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="bg-brand-100 text-brand-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                      {getInitials(c.freelancerName)}
-                    </span>
+                    <Avatar name={c.freelancerName} imageUrl={c.freelancerImageUrl} accent="freelancer" />
                     <div>
                       <h3 className="text-text-primary text-base font-semibold">
                         {c.jobTitle}

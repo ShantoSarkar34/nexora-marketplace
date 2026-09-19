@@ -60,8 +60,9 @@ function ClientApplicationsContent() {
       return sortBy === "newest" ? diff : -diff;
     });
     return all;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results.map((r) => r.dataUpdatedAt).join(","), statusFilter, sortBy]);
+
+  // console.log(applicants)
 
   return (
     <div className="space-y-6">

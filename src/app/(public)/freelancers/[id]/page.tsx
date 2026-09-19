@@ -57,7 +57,7 @@ export default function FreelancerPublicProfilePage() {
     );
   }
 
-  const name = user?.name || "Freelancer";
+  const name = profile?.name || "Freelancer";
   const email = user?.email;
 
   return (
@@ -81,7 +81,7 @@ export default function FreelancerPublicProfilePage() {
                   <div className="bg-client-500/10 text-client-500 flex h-full w-full items-center justify-center text-2xl font-semibold">
                     {name
                       .split(" ")
-                      .map((part) => part[0])
+                      .map((part: any) => part[0])
                       .join("")
                       .slice(0, 2)
                       .toUpperCase()}

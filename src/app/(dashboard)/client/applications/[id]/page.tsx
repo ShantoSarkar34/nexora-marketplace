@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
 import { ApplicationStatusBadge } from "@/features/applications/status-badge";
-import { getInitials } from "@/lib/get-initials";
+import { Avatar } from "@/components/shared/avatar";
 import {
   useApplication,
   useUpdateApplicationStatus,
@@ -24,6 +24,8 @@ export default function ApplicantDetailsPage() {
   const { data: application, isLoading, isError } = useApplication(params.id);
   const updateStatus = useUpdateApplicationStatus();
   const hireFreelancer = useHireFreelancer();
+
+  // console.log(application)
 
   if (isLoading) {
     return (
@@ -74,9 +76,12 @@ export default function ApplicantDetailsPage() {
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="bg-brand-100 text-brand-700 flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold">
-            {getInitials(application.freelancerName)}
-          </span>
+          <Avatar
+            name={application.freelancerName}
+            imageUrl={application.freelancerImageUrl}
+            size="lg"
+            accent="freelancer"
+          />
           <div>
             <h1>{application.freelancerName}</h1>
             {application.freelancerTitle && (
