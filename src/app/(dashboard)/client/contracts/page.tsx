@@ -60,8 +60,7 @@ export default function ClientContractsPage() {
                   <div className="flex flex-col items-end gap-1">
                     <ContractStatusBadge status={c.status} />
                     <span className="text-text-primary text-xs font-medium">
-                      ${c.budget}
-                      {c.budgetType === "HOURLY" ? "/hr" : " fixed"}
+                      ${c.agreedBudget}
                     </span>
                   </div>
                 </div>

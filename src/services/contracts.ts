@@ -4,11 +4,12 @@ import type { Contract } from "@/types/contract";
 function normalizeContract(raw: any): Contract {
   const freelancer = raw.freelancer ?? {};
   const client = raw.client ?? {};
+  const job = raw.job ?? {};
 
   return {
     id: raw.id,
-    jobId: raw.jobId,
-    jobTitle: raw.jobTitle ?? raw.job?.title ?? "Untitled job",
+    jobId: raw.jobId ?? job.id,
+    jobTitle: raw.jobTitle ?? job.title ?? "Untitled job",
     clientId: raw.clientId ?? client.id ?? "",
     clientName: raw.clientName ?? client.name ?? "Unknown Client",
     clientImageUrl: raw.clientImageUrl ?? client.imageUrl,
@@ -16,8 +17,7 @@ function normalizeContract(raw: any): Contract {
     freelancerName:
       raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
     freelancerImageUrl: raw.freelancerImageUrl ?? freelancer.imageUrl,
-    budget: raw.budget ?? 0,
-    budgetType: raw.budgetType,
+    agreedBudget: Number(raw.agreedBudget) || 0,
     status: raw.status,
     submissionNote: raw.submissionNote,
     submissionUrl: raw.submissionUrl,

@@ -21,26 +21,26 @@ export interface Application {
 }
 
 function normalizeApplication(raw: any): Application {
-  const freelancer = raw.freelancer ?? raw.applicant ?? raw.user ?? {};
+  const freelancer = raw.freelancer ?? {};
+  const freelancerProfile = freelancer.freelancerProfile ?? {};
   const job = raw.job ?? {};
-  const client = raw.client ?? job.client ?? {};
+  const client = raw.client ?? {};
 
   return {
     id: raw.id,
     jobId: raw.jobId ?? job.id,
     jobTitle: raw.jobTitle ?? job.title ?? "Untitled job",
-    clientId: raw.clientId ?? client.id ?? "",
-    clientName:
-      raw.clientName ?? client.name ?? client.companyName ?? "Unknown Client",
+    clientId: raw.clientId ?? job.clientId ?? client.id ?? "",
+    clientName: raw.clientName ?? client.name ?? client.companyName ?? "",
     clientImageUrl: raw.clientImageUrl ?? client.imageUrl,
     freelancerId: raw.freelancerId ?? freelancer.id ?? "",
     freelancerName:
       raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
     freelancerImageUrl: raw.freelancerImageUrl ?? freelancer.imageUrl,
     freelancerTitle:
-      raw.freelancerTitle ?? freelancer.title ?? freelancer.profile?.title,
+      raw.freelancerTitle ?? freelancerProfile.title ?? freelancer.title,
     coverLetter: raw.coverLetter ?? "",
-    proposedBudget: raw.proposedBudget ?? 0,
+    proposedBudget: Number(raw.proposedBudget) || 0,
     estimatedDeliveryDays: raw.estimatedDeliveryDays ?? 0,
     status: raw.status,
     createdAt: raw.createdAt,

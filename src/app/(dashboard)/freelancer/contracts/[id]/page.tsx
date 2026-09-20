@@ -86,8 +86,7 @@ export default function FreelancerContractDetailsPage() {
           <div>
             <p className="text-text-secondary">Budget</p>
             <p className="text-text-primary font-semibold">
-              ${contract.budget}
-              {contract.budgetType === "HOURLY" ? "/hr" : " fixed"}
+              ${contract.agreedBudget}
             </p>
           </div>
           <div>

@@ -1,4 +1,4 @@
-import { BudgetType, ContractStatus } from "./enums";
+import type { ContractStatus } from "@/types/enums";
 
 export interface Contract {
   id: string;
@@ -10,8 +10,7 @@ export interface Contract {
   freelancerId: string;
   freelancerName: string;
   freelancerImageUrl?: string;
-  budget: number;
-  budgetType: BudgetType;
+  agreedBudget: number;
   status: ContractStatus;
   submissionNote?: string;
   submissionUrl?: string;

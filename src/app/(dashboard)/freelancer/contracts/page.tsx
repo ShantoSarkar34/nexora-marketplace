@@ -63,8 +63,7 @@ export default function FreelancerContractsPage() {
                   <ContractStatusBadge status={c.status} />
                 </div>
                 <p className="text-text-primary mt-3 text-sm font-medium">
-                  ${c.budget}
-                  {c.budgetType === "HOURLY" ? "/hr" : " fixed"}
+                  ${c.agreedBudget}
                 </p>
                 {c.status === "PENDING" && (
                   <p className="text-status-pending mt-2 text-xs">
