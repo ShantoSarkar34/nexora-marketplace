@@ -25,7 +25,7 @@ export default function ApplicantDetailsPage() {
   const updateStatus = useUpdateApplicationStatus();
   const hireFreelancer = useHireFreelancer();
 
-  console.log(application)
+  // console.log(application)
 
   if (isLoading) {
     return (

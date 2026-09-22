@@ -13,8 +13,6 @@ import { Avatar } from "@/components/shared/avatar";
 export default function ClientContractsPage() {
   const { data: contracts, isLoading } = useMyContracts();
 
-  // console.log(contracts)
-
   return (
     <div className="space-y-6">
       <div>

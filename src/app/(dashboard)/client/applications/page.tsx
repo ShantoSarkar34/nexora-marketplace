@@ -63,7 +63,7 @@ function ClientApplicationsContent() {
     return all;
   }, [results.map((r) => r.dataUpdatedAt).join(","), statusFilter, sortBy]);
 
-  console.log(applicants)
+  // console.log(applicants)
 
   return (
     <div className="space-y-6">

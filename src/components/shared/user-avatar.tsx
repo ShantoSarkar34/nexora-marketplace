@@ -19,7 +19,7 @@ export function UserAvatar({
   accent,
 }: UserAvatarProps) {
   const { data: imageUrl } = useUserAvatar(userId, role);
-  console.log(imageUrl)
+  // console.log(imageUrl)
   return (
     <Avatar
       name={name}
