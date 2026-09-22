@@ -16,7 +16,7 @@ import { getInitials } from "@/lib/get-initials";
 import { useMyJobs } from "@/hooks/use-jobs";
 import { applicationsService } from "@/services/applications";
 import type { ApplicationStatus } from "@/types/enums";
-import { UserAvatar } from "@/components/shared/user-avatar";
+import { Avatar } from "@/components/shared/avatar";
 
 const ALL_JOBS = "ALL";
 
@@ -62,8 +62,6 @@ function ClientApplicationsContent() {
     });
     return all;
   }, [results.map((r) => r.dataUpdatedAt).join(","), statusFilter, sortBy]);
-
-  // console.log(applicants)
 
   return (
     <div className="space-y-6">
@@ -143,7 +141,11 @@ function ClientApplicationsContent() {
               <Card className="hover:border-brand-300 transition-colors">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <UserAvatar userId={app.freelancerId} role="FREELANCER" name={app.freelancerName} accent="freelancer" />
+                    <Avatar
+                      name={app.freelancerName}
+                      imageUrl={app.freelancerImageUrl}
+                      accent="freelancer"
+                    />
                     <div>
                       <p className="text-text-primary text-sm font-semibold">
                         {app.freelancerName}

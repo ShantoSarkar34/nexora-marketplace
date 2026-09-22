@@ -24,7 +24,7 @@ function normalizeApplication(raw: any): Application {
   const freelancer = raw.freelancer ?? {};
   const freelancerProfile = freelancer.freelancerProfile ?? {};
   const job = raw.job ?? {};
-  const client = raw.client ?? {};
+  const client = raw.client ?? job.client ?? {};
 
   return {
     id: raw.id,
@@ -34,11 +34,9 @@ function normalizeApplication(raw: any): Application {
     clientName: raw.clientName ?? client.name ?? client.companyName ?? "",
     clientImageUrl: raw.clientImageUrl ?? client.imageUrl,
     freelancerId: raw.freelancerId ?? freelancer.id ?? "",
-    freelancerName:
-      raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
+    freelancerName: raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
     freelancerImageUrl: raw.freelancerImageUrl ?? freelancer.imageUrl,
-    freelancerTitle:
-      raw.freelancerTitle ?? freelancerProfile.title ?? freelancer.title,
+    freelancerTitle: raw.freelancerTitle ?? freelancerProfile.title ?? freelancer.title,
     coverLetter: raw.coverLetter ?? "",
     proposedBudget: Number(raw.proposedBudget) || 0,
     estimatedDeliveryDays: raw.estimatedDeliveryDays ?? 0,

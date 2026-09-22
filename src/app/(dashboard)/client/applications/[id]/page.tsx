@@ -25,8 +25,6 @@ export default function ApplicantDetailsPage() {
   const updateStatus = useUpdateApplicationStatus();
   const hireFreelancer = useHireFreelancer();
 
-  // console.log(application)
-
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
