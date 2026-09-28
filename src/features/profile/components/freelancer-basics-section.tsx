@@ -88,14 +88,17 @@ function BasicsForm({ user, profile, onDone }: Props & { onDone: () => void }) {
 
   async function onSubmit(values: FreelancerBasicsValues) {
     try {
-      await Promise.all([
-        updateMe.mutateAsync({ name: values.name }),
-        updateBasics.mutateAsync({
-          title: values.title,
-          bio: values.bio,
-          hourlyRate: values.hourlyRate,
-        }),
-      ]);
+      await updateBasics.mutateAsync({
+        title: values.title,
+        bio: values.bio,
+        hourlyRate: values.hourlyRate,
+      });
+
+      const newName = values.name.trim();
+      if (newName !== user.name) {
+        await updateMe.mutateAsync({ name: newName });
+      }
+
       toast.success("Profile updated");
       onDone();
     } catch (error) {

@@ -13,9 +13,30 @@ import type {
   Skill,
 } from "@/types/profile";
 
+function monthToIso(month: string) {
+  return new Date(`${month}-01T00:00:00.000Z`).toISOString();
+}
+
+function isoToMonth(value: string) {
+  return value.slice(0, 7);
+}
+
+function normalizeExperience(raw: any): Experience {
+  return {
+    id: raw.id,
+    title: raw.title ?? "",
+    company: raw.company ?? "",
+    startDate: raw.startDate ? isoToMonth(raw.startDate) : "",
+    endDate: raw.endDate ? isoToMonth(raw.endDate) : null,
+    isCurrent: !!raw.isCurrent,
+    description: raw.description ?? undefined,
+  };
+}
+
 function normalizeFreelancerProfile(raw: any): FreelancerProfile {
   return {
     id: raw.id,
+    user: raw.user,
     userId: raw.userId,
     title: raw.title ?? "",
     bio: raw.bio ?? "",
@@ -25,8 +46,9 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
       id: s.skillId ?? s.skill?.id ?? s.id,
       name: s.skill?.name ?? s.name ?? "",
     })),
-    user: raw.user ?? raw.user ?? [],
-    experience: raw.experiences ?? raw.experience ?? [],
+    experience: (raw.experiences ?? raw.experience ?? []).map(
+      normalizeExperience,
+    ),
     portfolio: raw.portfolios ?? raw.portfolio ?? [],
   };
 }
@@ -37,11 +59,19 @@ export const freelancerProfileService = {
     return normalizeFreelancerProfile(res.data);
   },
   create: async (payload: FreelancerBasicsValues) => {
-    const res = await apiClient.post<any>("/profiles/freelancer", payload);
+    const { name: _name, ...profileFields } = payload;
+    const res = await apiClient.post<any>(
+      "/profiles/freelancer",
+      profileFields,
+    );
     return normalizeFreelancerProfile(res.data);
   },
   update: async (payload: Partial<FreelancerBasicsValues>) => {
-    const res = await apiClient.patch<any>("/profiles/freelancer/me", payload);
+    const { name: _name, ...profileFields } = payload;
+    const res = await apiClient.patch<any>(
+      "/profiles/freelancer/me",
+      profileFields,
+    );
     return normalizeFreelancerProfile(res.data);
   },
   addSkill: async (name: string) => {
@@ -54,11 +84,16 @@ export const freelancerProfileService = {
     await apiClient.delete<void>(`/profiles/freelancer/skills/${skillId}`);
   },
   addExperience: async (payload: ExperienceInput) => {
-    const res = await apiClient.post<Experience>(
-      "/profiles/freelancer/experience",
-      payload,
-    );
-    return res.data;
+    const { startDate, endDate, isCurrent, description, ...rest } = payload;
+    const res = await apiClient.post<any>("/profiles/freelancer/experience", {
+      ...rest,
+      startDate: monthToIso(startDate),
+      isCurrent: !!isCurrent,
+      // A current role has no end date.
+      ...(!isCurrent && endDate ? { endDate: monthToIso(endDate) } : {}),
+      ...(description?.trim() ? { description: description.trim() } : {}),
+    });
+    return normalizeExperience(res.data);
   },
   removeExperience: async (experienceId: string) => {
     await apiClient.delete<void>(
@@ -81,8 +116,8 @@ export const freelancerProfileService = {
     const res = await apiClient.get<any>(`/profiles/freelancer/${userId}`);
     return {
       ...normalizeFreelancerProfile(res.data),
-      name: res.data.name,
-      avatarInitials: res.data.avatarInitials,
+      name: res.data.name as string,
+      imageUrl: res.data.imageUrl as string | undefined,
     };
   },
 };
@@ -107,9 +142,9 @@ export const clientProfileService = {
     return res.data;
   },
   getPublic: async (userId: string) => {
-    const res = await apiClient.get<ClientProfile & { name: string }>(
-      `/profiles/client/${userId}`,
-    );
+    const res = await apiClient.get<
+      ClientProfile & { name: string; imageUrl?: string }
+    >(`/profiles/client/${userId}`);
     return res.data;
   },
 };

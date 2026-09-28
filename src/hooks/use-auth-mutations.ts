@@ -24,15 +24,6 @@ export function useRegister() {
   });
 }
 
-export function useUpdateMe() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: { name?: string; avatarUrl?: string }) =>
-      authService.updateMe(payload),
-    onSuccess: (user) => qc.setQueryData(authQueryKey, user),
-  });
-}
-
 export function useLogout() {
   const qc = useQueryClient();
   return useMutation({
@@ -80,6 +71,14 @@ export function useResetPassword() {
       token: string;
       newPassword: string;
     }) => authService.resetPassword(token, newPassword),
+  });
+}
+
+export function useUpdateMe() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { name?: string }) => authService.updateMe(payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: authQueryKey }),
   });
 }
 

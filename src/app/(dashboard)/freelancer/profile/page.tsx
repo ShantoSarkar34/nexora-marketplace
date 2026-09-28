@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-
 import { Spinner } from "@/components/ui/spinner";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -19,8 +20,6 @@ import { ExperienceSection } from "@/features/profile/components/experience-sect
 import { PortfolioSection } from "@/features/profile/components/portfolio-section";
 import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 import { useAuth } from "@/hooks/use-auth";
-import Link from "next/link";
-import { ExternalLink } from "lucide-react";
 import {
   useCreateFreelancerProfile,
   useFreelancerProfile,
@@ -46,7 +45,7 @@ export default function FreelancerProfilePage() {
 
   if (notFound || !profile) {
     return creating ? (
-      <CreateProfileForm />
+      <CreateProfileForm userName={user?.name ?? ""} />
     ) : (
       <CreateProfilePrompt
         title="Set up your profile"
@@ -60,7 +59,7 @@ export default function FreelancerProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1>My Profile</h1>
           <p className="text-text-secondary mt-1">
@@ -68,7 +67,7 @@ export default function FreelancerProfilePage() {
           </p>
         </div>
         {user && (
-          <Link href={`/freelancers/${user.id}`}>
+          <Link href={`/freelancers/${user.id}`} target="_blank">
             <Button variant="secondary" size="sm">
               <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
               View public profile
@@ -88,7 +87,7 @@ export default function FreelancerProfilePage() {
   );
 }
 
-function CreateProfileForm() {
+function CreateProfileForm({ userName }: { userName: string }) {
   const createProfile = useCreateFreelancerProfile();
   const {
     register,
@@ -96,6 +95,7 @@ function CreateProfileForm() {
     formState: { errors },
   } = useForm<FreelancerBasicsInput, unknown, FreelancerBasicsValues>({
     resolver: zodResolver(freelancerBasicsSchema),
+    defaultValues: { name: userName },
   });
 
   async function onSubmit(values: FreelancerBasicsValues) {
