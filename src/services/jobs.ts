@@ -14,6 +14,31 @@ function buildQuery(params: object) {
   return qs ? `?${qs}` : "";
 }
 
+function normalizeSavedJob(raw: any): Job {
+  const job = raw.job ?? raw;
+  return {
+    id: job.id,
+    title: job.title,
+    description: job.description,
+    category: job.category,
+    skills: job.skills ?? [],
+    budgetType: job.budgetType,
+    budgetMin: Number(job.budgetMin) || 0,
+    budgetMax: Number(job.budgetMax) || 0,
+    experienceLevel: job.experienceLevel,
+    deadline: job.deadline,
+    status: job.status,
+    clientId: job.clientId ?? job.client?.id ?? "",
+    clientName:
+      job.clientName ??
+      job.client?.name ??
+      job.client?.companyName ??
+      "Unknown Client",
+    applicantCount: job.applicantCount ?? job._count?.applications ?? 0,
+    createdAt: job.createdAt,
+  };
+}
+
 export const jobsService = {
   list: async (params: JobListParams) => {
     const res = await apiClient.get<Job[]>(`/jobs${buildQuery(params)}`);
@@ -68,10 +93,10 @@ export const jobsService = {
     return { jobs: res.data, meta: res.meta };
   },
   savedJobs: async (params: { page?: number; limit?: number } = {}) => {
-    const res = await apiClient.get<Job[]>(
+    const res = await apiClient.get<any[]>(
       `/jobs/saved/me${buildQuery(params)}`,
     );
-    return { jobs: res.data, meta: res.meta };
+    return { jobs: res.data.map(normalizeSavedJob), meta: res.meta };
   },
   save: async (jobId: string) => {
     await apiClient.post<void>(`/jobs/${jobId}/save`);
