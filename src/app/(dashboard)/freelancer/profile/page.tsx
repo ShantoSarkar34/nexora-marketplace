@@ -17,7 +17,7 @@ import { CreateProfilePrompt } from "@/features/profile/components/create-profil
 import { FreelancerBasicsSection } from "@/features/profile/components/freelancer-basics-section";
 import { SkillsSection } from "@/features/profile/components/skills-section";
 import { ExperienceSection } from "@/features/profile/components/experience-section";
-import { PortfolioSection } from "@/features/profile/components/portfolio-section";
+// import { PortfolioSection } from "@/features/profile/components/portfolio-section";
 import { ProfileReviewsSection } from "@/features/reviews/components/profile-reviews-section";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -81,7 +81,7 @@ export default function FreelancerProfilePage() {
       {user && <FreelancerBasicsSection user={user} profile={profile} />}
       <SkillsSection skills={profile.skills} />
       <ExperienceSection experience={profile.experience} />
-      <PortfolioSection portfolio={profile.portfolio} />
+      {/* <PortfolioSection portfolio={profile.portfolio} /> */}
       {user && <ProfileReviewsSection userId={user.id} />}
     </div>
   );
