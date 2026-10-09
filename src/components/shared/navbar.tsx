@@ -56,7 +56,7 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <LanguageToggle />
+          {/* <LanguageToggle /> */}
           <ThemeToggle />
           <div className="bg-border mx-1 h-6 w-px" />
           {isLoading ? (
@@ -105,7 +105,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
-          <LanguageToggle />
+          {/* <LanguageToggle /> */}
           <ThemeToggle />
           <button
             onClick={() => setIsOpen((v) => !v)}
