@@ -10,6 +10,7 @@ import { CountUp } from "@/components/shared/count-up";
 import { JobCard } from "@/features/jobs/components/job-card";
 import { jobCategoryLabels } from "@/types/enums";
 import { useJobs } from "@/hooks/use-jobs";
+import { AiMatchingShowcase } from "@/features/home/components/ai-matching-showcase";
 
 const freelancerSteps = [
   "Build a profile with real skills and portfolio work",
@@ -39,9 +40,10 @@ export default function HomePage() {
     <div>
       <section>
         <HomeHero />
+        <AiMatchingShowcase />
       </section>
 
-      {totalOpenJobs > 0 && (
+      {/* {totalOpenJobs > 0 && (
         <section className="border-border bg-surface-muted border-y">
           <div className="mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 lg:px-8">
             <p className="text-brand-600 text-3xl font-bold">
@@ -52,10 +54,10 @@ export default function HomePage() {
             </p>
           </div>
         </section>
-      )}
+      )} */}
 
       {/* Real, live jobs — not placeholder content */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      {/* <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <h2>Recently posted jobs</h2>
           <Link
@@ -83,10 +85,10 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* Category quick links — real filter targets, not decoration */}
-      <section className="border-border bg-surface-muted border-y">
+      {/* <section className="border-border bg-surface-muted border-y">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <h2 className="text-center">Browse by category</h2>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -101,8 +103,8 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
-
+      </section> */}
+{/* 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <h2 className="text-center">How Nexora works</h2>
         <div className="mt-12 grid gap-8 md:grid-cols-2">
@@ -153,9 +155,9 @@ export default function HomePage() {
             </ol>
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
-      <motion.section
+      {/* <motion.section
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -176,7 +178,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </motion.section>
+      </motion.section> */}
     </div>
   );
 }
