@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-
+import { HomeHero } from "@/features/home/components/home-hero";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { MatchPreviewCard } from "@/components/shared/match-preview-card";
 import { CountUp } from "@/components/shared/count-up";
 import { JobCard } from "@/features/jobs/components/job-card";
 import { jobCategoryLabels } from "@/types/enums";
@@ -38,50 +37,8 @@ export default function HomePage() {
 
   return (
     <div>
-      <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-        >
-          <motion.h1
-            variants={fadeUp}
-            transition={{ duration: 0.5 }}
-            className="text-text-primary text-4xl font-bold tracking-tight sm:text-5xl"
-          >
-            Freelance work, matched by what your skills actually say.
-          </motion.h1>
-          <motion.p
-            variants={fadeUp}
-            transition={{ duration: 0.5 }}
-            className="text-text-secondary mt-6 text-lg"
-          >
-            Nexora reads the real overlap between a freelancer&apos;s profile
-            and a job&apos;s requirements — so freelancers apply to jobs they
-            can actually win, and clients hire people who actually fit.
-          </motion.p>
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: 0.5 }}
-            className="mt-8 flex flex-col gap-3 sm:flex-row"
-          >
-            <Link href="/register?role=freelancer">
-              <Button size="lg" className="w-full sm:w-auto">
-                Find work
-              </Button>
-            </Link>
-            <Link href="/register?role=client">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="w-full sm:w-auto"
-              >
-                Hire talent
-              </Button>
-            </Link>
-          </motion.div>
-        </motion.div>
-        <MatchPreviewCard />
+      <section>
+        <HomeHero />
       </section>
 
       {totalOpenJobs > 0 && (
