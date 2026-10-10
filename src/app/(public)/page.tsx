@@ -12,6 +12,7 @@ import { jobCategoryLabels } from "@/types/enums";
 import { useJobs } from "@/hooks/use-jobs";
 import { AiMatchingShowcase } from "@/features/home/components/ai-matching-showcase";
 import { RecentJobCard } from "@/features/home/components/recent-job-card";
+import { HomeCategories } from "@/features/home/components/home-categories";
 
 const freelancerSteps = [
   "Build a profile with real skills and portfolio work",
@@ -89,22 +90,9 @@ export default function HomePage() {
       </section>
 
       {/* Category quick links — real filter targets, not decoration */}
-      {/* <section className="border-border bg-surface-muted border-y">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <h2 className="text-center">Browse by category</h2>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {Object.entries(jobCategoryLabels).map(([value, label]) => (
-              <Link
-                key={value}
-                href={`/jobs?category=${value}`}
-                className="border-border bg-surface text-text-primary hover:border-brand-500 hover:text-brand-600 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section> */}
+      <section className="border-border bg-surface-muted border-y">
+        <HomeCategories/>
+      </section>
       {/* 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <h2 className="text-center">How Nexora works</h2>
