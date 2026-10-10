@@ -11,6 +11,7 @@ import { JobCard } from "@/features/jobs/components/job-card";
 import { jobCategoryLabels } from "@/types/enums";
 import { useJobs } from "@/hooks/use-jobs";
 import { AiMatchingShowcase } from "@/features/home/components/ai-matching-showcase";
+import { RecentJobCard } from "@/features/home/components/recent-job-card";
 
 const freelancerSteps = [
   "Build a profile with real skills and portfolio work",
@@ -57,7 +58,7 @@ export default function HomePage() {
       )} */}
 
       {/* Real, live jobs — not placeholder content */}
-      {/* <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <h2>Recently posted jobs</h2>
           <Link
@@ -78,14 +79,14 @@ export default function HomePage() {
               No open jobs yet — check back soon.
             </p>
           ) : (
-            <div className="space-y-4">
+            <div className="mt-8 space-y-4">
               {recentJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <RecentJobCard key={job.id} job={job} />
               ))}
             </div>
           )}
         </div>
-      </section> */}
+      </section>
 
       {/* Category quick links — real filter targets, not decoration */}
       {/* <section className="border-border bg-surface-muted border-y">
@@ -104,7 +105,7 @@ export default function HomePage() {
           </div>
         </div>
       </section> */}
-{/* 
+      {/* 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <h2 className="text-center">How Nexora works</h2>
         <div className="mt-12 grid gap-8 md:grid-cols-2">
