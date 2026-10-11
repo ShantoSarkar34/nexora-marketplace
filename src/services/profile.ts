@@ -13,6 +13,36 @@ import type {
   Skill,
 } from "@/types/profile";
 
+export interface FreelancerListItem {
+  id: string;
+  userId: string;
+  title: string | null;
+  bio: string | null;
+  hourlyRate: number | string | null;
+  skills: {
+    id: string;
+    skillId: string;
+    skill: {
+      id: string;
+      name: string;
+    };
+  }[];
+  user: {
+    name: string;
+    imageUrl: string | null;
+  };
+}
+
+export interface FreelancerListResponse {
+  freelancers: FreelancerListItem[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 function monthToIso(month: string) {
   return new Date(`${month}-01T00:00:00.000Z`).toISOString();
 }
@@ -54,6 +84,16 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
 }
 
 export const freelancerProfileService = {
+  getAll: async (page = 1, limit = 6) => {
+    const res = await apiClient.get<{
+      success: boolean;
+      message: string;
+      data: FreelancerListResponse;
+    }>(`/profiles/freelancer?page=${page}&limit=${limit}`);
+
+    return res.data.data;
+  },
+
   getMe: async () => {
     const res = await apiClient.get<any>("/profiles/freelancer/me");
     return normalizeFreelancerProfile(res.data);
