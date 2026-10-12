@@ -13,6 +13,7 @@ import { useJobs } from "@/hooks/use-jobs";
 import { AiMatchingShowcase } from "@/features/home/components/ai-matching-showcase";
 import { RecentJobCard } from "@/features/home/components/recent-job-card";
 import { HomeCategories } from "@/features/home/components/home-categories";
+import { FeaturedTalent } from "@/features/home/components/featured-talent";
 
 const freelancerSteps = [
   "Build a profile with real skills and portfolio work",
@@ -93,6 +94,9 @@ export default function HomePage() {
       <section className="border-border bg-surface-muted border-y">
         <HomeCategories/>
       </section>
+
+      <FeaturedTalent />
+
       {/* 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <h2 className="text-center">How Nexora works</h2>
