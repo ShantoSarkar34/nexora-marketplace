@@ -17,6 +17,7 @@ import { FeaturedTalent } from "@/features/home/components/featured-talent";
 import { WhyChooseNexora } from "@/features/home/components/why-choose-nexora";
 import { HowNexoraWorks } from "@/features/home/components/how-nexora-works";
 import { HomeFaq } from "@/features/home/components/home-faq";
+import { HomeCta } from "@/features/home/components/home-cta";
 
 // const freelancerSteps = [
 //   "Build a profile with real skills and portfolio work",
@@ -105,6 +106,8 @@ export default function HomePage() {
       <HowNexoraWorks />
 
       <HomeFaq/>
+
+      <HomeCta/>
 
       {/* 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
