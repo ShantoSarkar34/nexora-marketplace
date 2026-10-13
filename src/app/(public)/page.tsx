@@ -14,30 +14,31 @@ import { AiMatchingShowcase } from "@/features/home/components/ai-matching-showc
 import { RecentJobCard } from "@/features/home/components/recent-job-card";
 import { HomeCategories } from "@/features/home/components/home-categories";
 import { FeaturedTalent } from "@/features/home/components/featured-talent";
+import { WhyChooseNexora } from "@/features/home/components/why-choose-nexora";
 
-const freelancerSteps = [
-  "Build a profile with real skills and portfolio work",
-  "Browse jobs matched to what you actually do",
-  "Get an AI match score before you apply",
-  "Apply, get hired, and get paid securely",
-];
+// const freelancerSteps = [
+//   "Build a profile with real skills and portfolio work",
+//   "Browse jobs matched to what you actually do",
+//   "Get an AI match score before you apply",
+//   "Apply, get hired, and get paid securely",
+// ];
 
-const clientSteps = [
-  "Post a job with the skills and budget you need",
-  "Review applicants ranked by AI match score",
-  "Shortlist, interview, and hire with confidence",
-  "Track work and pay only when it's approved",
-];
+// const clientSteps = [
+//   "Post a job with the skills and budget you need",
+//   "Review applicants ranked by AI match score",
+//   "Shortlist, interview, and hire with confidence",
+//   "Track work and pay only when it's approved",
+// ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
+// const fadeUp = {
+//   hidden: { opacity: 0, y: 24 },
+//   visible: { opacity: 1, y: 0 },
+// };
 
 export default function HomePage() {
   const { data, isLoading } = useJobs({ sortBy: "newest", limit: 3, page: 1 });
   const recentJobs = data?.jobs ?? [];
-  const totalOpenJobs = data?.meta?.total ?? 0;
+  // const totalOpenJobs = data?.meta?.total ?? 0;
 
   return (
     <div>
@@ -96,6 +97,8 @@ export default function HomePage() {
       </section>
 
       <FeaturedTalent />
+
+      <WhyChooseNexora />
 
       {/* 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
