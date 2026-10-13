@@ -94,13 +94,13 @@ export const freelancerProfileService = {
     return res.data.data;
   },
 
-  // getAll: async (page = 1, limit = 6) => {
-  //   const res = await apiClient.get<FreelancerListResponse>(
-  //     `/profiles/freelancer?page=${page}&limit=${limit}`,
-  //   );
+  getFeaturedTalent: async (page = 1, limit = 6) => {
+    const res = await apiClient.get<FreelancerListResponse>(
+      `/profiles/freelancer?page=${page}&limit=${limit}`,
+    );
 
-  //   return res.data;
-  // },
+    return res.data;
+  },
 
   getMe: async () => {
     const res = await apiClient.get<any>("/profiles/freelancer/me");

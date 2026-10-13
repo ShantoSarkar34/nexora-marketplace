@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Users } from "lucide-react";
 
-import { useFreelancers } from "@/hooks/use-freelancers";
+import { useFeaturedTalent } from "@/hooks/use-featured-talent";
 import { FeaturedTalentCard } from "./featured-talent-card";
 
 function TalentCardSkeleton() {
@@ -28,7 +28,7 @@ function TalentCardSkeleton() {
 }
 
 export function FeaturedTalent() {
-  const { data, isLoading, isError, refetch } = useFreelancers(1, 6);
+  const { data, isLoading, isError, refetch } = useFeaturedTalent(1, 6);
   const freelancers = data?.freelancers ?? [];
 
   return (

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, BriefcaseBusiness, UserRound } from "lucide-react";
 
@@ -25,7 +24,7 @@ export function FeaturedTalentCard({
       <div className="flex items-start gap-4">
         <div className="bg-brand-500/10 relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full">
           {freelancer.user.imageUrl ? (
-            <Image
+            <img
               src={freelancer.user.imageUrl}
               alt={freelancer.user.name}
               width={56}
