@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getInitials } from "@/lib/get-initials";
 
@@ -14,6 +15,12 @@ const sizeClasses = {
   lg: "h-14 w-14 text-lg",
 };
 
+const imageSizes = {
+  sm: 32,
+  md: 40,
+  lg: 56,
+};
+
 const accentClasses = {
   brand: "bg-brand-100 text-brand-700",
   freelancer: "bg-freelancer-500/10 text-freelancer-500",
@@ -28,13 +35,17 @@ export function Avatar({
 }: AvatarProps) {
   if (imageUrl) {
     return (
-      <img
+      <Image
         src={imageUrl}
         alt={name}
+        width={imageSizes[size]}
+        height={imageSizes[size]}
+        sizes={`${imageSizes[size]}px`}
         className={cn("shrink-0 rounded-full object-cover", sizeClasses[size])}
       />
     );
   }
+
   return (
     <span
       className={cn(
