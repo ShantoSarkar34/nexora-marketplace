@@ -84,17 +84,17 @@ This is a full-stack portfolio project made of two repositories:
 
 ## Project Screenshots
 
-| Job Marketplace |
-|---|---|
-| ![Job Marketplace](./public/nexora-project/jobs.png) |
+** Job Marketplace **
+![Job Marketplace](./public/nexora-project/jobs.png)
 
-| Freelancer Dashboard | Client Dashboard |
-|---|---|
-| ![Freelancer Dashboard](./public/nexora-project/dashboard_1.png) | ![Client Dashboard](./public/nexora-project/nexora_admin.png) |
+** Freelancer Dashboard ** 
+![Freelancer Dashboard](./public/nexora-project/dashboard_1.png)
 
-| AI Job Match |
-|---|---|
-| ![AI Job Match](./public/nexora-project/Ai.png) |
+**Client Dashboard **
+![Client Dashboard](./public/nexora-project/nexora_admin.png)
+
+** AI Job Match **
+![AI Job Match](./public/nexora-project/Ai.png) 
 
 ---
 
@@ -364,7 +364,7 @@ Both apps deploy to **Vercel**: the frontend as a Next.js app and the backend as
 - [ ] Disputes and an admin panel
 - [ ] Personalized job feed
 - [ ] File attachments on work submissions
-- [ ] Full Bangla translation beyond the navigation
+- [ ] Full Bangla translation beyond the navigation (on working)
 
 ---
 
@@ -373,4 +373,3 @@ Both apps deploy to **Vercel**: the frontend as a Next.js app and the backend as
 **Md. Shanto Sarkar** — Full Stack Developer
 
 - Portfolio: [shanto9070.vercel.app](https://shanto9070.vercel.app)
-- GitHub: [@ShantoSarkar34](https://github.com/ShantoSarkar34)
