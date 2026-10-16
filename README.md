@@ -86,7 +86,7 @@ This is a full-stack portfolio project made of two repositories:
 
 | Landing Page | Job Marketplace |
 |---|---|
-| ![Landing Page](./public/nexora-project/hero.png) | ![Job Marketplace](./public/nexora-project/jobs.png) |
+| ![Job Marketplace](./public/nexora-project/jobs.png) |
 
 | Freelancer Dashboard | Client Dashboard |
 |---|---|
