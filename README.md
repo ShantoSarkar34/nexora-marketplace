@@ -81,23 +81,23 @@ This is a full-stack portfolio project made of two repositories:
 
 ---
 
-## Screenshots
 
-<!-- Add screenshots to docs/screenshots/ and replace these placeholders. -->
+## Project Screenshots
 
-| Landing page | Job marketplace |
+| Landing Page | Job Marketplace |
 |---|---|
-|  `/public/nexora-project/home.png` | `/public/nexora-project/jobs.png` |
+| ![Landing Page](./public/nexora-project/hero.png) | ![Job Marketplace](./public/nexora-project/jobs.png) |
 
-| Freelancer dashboard | Client dashboard |
+| Freelancer Dashboard | Client Dashboard |
 |---|---|
-| _add `docs/screenshots/freelancer-dashboard.png`_ | _add `docs/screenshots/client-dashboard.png`_ |
+| ![Freelancer Dashboard](./public/nexora-project/dashboard_1.png) | ![Client Dashboard](./public/nexora-project/nexora_admin.png) |
 
-| AI job match | Contract workflow |
+| AI Job Match |
 |---|---|
-| _add `docs/screenshots/ai-match.png`_ | _add `docs/screenshots/contract.png`_ |
+| ![AI Job Match](./public/nexora-project/Ai.png) |
 
 ---
+
 
 ## Tech Stack
 
