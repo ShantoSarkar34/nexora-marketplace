@@ -17,7 +17,7 @@ export function ProtectedRoute({
   children,
 }: ProtectedRouteProps) {
   const router = useRouter();
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, isSuspended } = useAuth();
 
   const isWrongRole =
     !isLoading && allowedRoles && user
@@ -26,6 +26,10 @@ export function ProtectedRoute({
 
   useEffect(() => {
     if (isLoading) return;
+    if (isSuspended) {
+      router.replace("/suspended");
+      return;
+    }
     if (!isAuthenticated) {
       router.replace("/login");
       return;
@@ -33,9 +37,9 @@ export function ProtectedRoute({
     if (isWrongRole) {
       router.replace("/");
     }
-  }, [isLoading, isAuthenticated, isWrongRole, router]);
+  }, [isLoading, isSuspended, isAuthenticated, isWrongRole, router]);
 
-  if (isLoading || !isAuthenticated || isWrongRole) {
+  if (isLoading || isSuspended || !isAuthenticated || isWrongRole) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Spinner className="h-8 w-8" />
