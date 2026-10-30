@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { ApiError } from "@/lib/api-client";
+import { ApiError, isSuspendedError } from "@/lib/api-client";
 import { authService } from "@/services/auth";
 
 export const authQueryKey = ["auth", "me"] as const;
@@ -18,6 +18,8 @@ export function useAuth() {
     meta: { silent: true },
   });
 
+  const isSuspended = query.isError && isSuspendedError(query.error);
+
   const isUnauthenticated =
     query.isError &&
     query.error instanceof ApiError &&
@@ -28,6 +30,7 @@ export function useAuth() {
     isLoading: query.isLoading,
     isAuthenticated: !!query.data,
     isUnauthenticated,
+    isSuspended,
     refetch: query.refetch,
     invalidate: () => queryClient.invalidateQueries({ queryKey: authQueryKey }),
     clear: () => queryClient.setQueryData(authQueryKey, null),

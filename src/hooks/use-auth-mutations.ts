@@ -14,6 +14,10 @@ export function useLogin() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
+    meta: {
+      rateLimitMessage:
+        "Too many login attempts. Please wait about 15 minutes and try again.",
+    },
     onSuccess: (user) => qc.setQueryData(authQueryKey, user),
   });
 }
@@ -21,6 +25,10 @@ export function useLogin() {
 export function useRegister() {
   return useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
+    meta: {
+      rateLimitMessage:
+        "Too many sign-up attempts from this network. Please try again in an hour.",
+    },
   });
 }
 
@@ -45,7 +53,13 @@ export function useGoogleLogin() {
 }
 
 export function useSendVerificationOtp() {
-  return useMutation({ mutationFn: () => authService.sendVerificationOtp() });
+  return useMutation({
+    mutationFn: () => authService.sendVerificationOtp(),
+    meta: {
+      rateLimitMessage:
+        "You've requested too many verification codes. You can ask for another in about an hour.",
+    },
+  });
 }
 
 export function useVerifyOtp() {
@@ -59,6 +73,10 @@ export function useVerifyOtp() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (email: string) => authService.forgotPassword(email),
+    meta: {
+      rateLimitMessage:
+        "Too many reset requests. Please wait about 15 minutes before trying again.",
+    },
   });
 }
 
@@ -78,6 +96,7 @@ export function useUpdateMe() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: { name?: string }) => authService.updateMe(payload),
+    // Refetch /auth/me rather than trusting the shape of the PATCH response.
     onSuccess: () => qc.invalidateQueries({ queryKey: authQueryKey }),
   });
 }
