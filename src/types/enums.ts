@@ -50,6 +50,17 @@ export const applicationStatusLabels: Record<ApplicationStatus, string> = {
   WITHDRAWN: "Withdrawn",
 };
 
+export type InvitationStatus =
+  "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED" | "EXPIRED";
+
+export const invitationStatusLabels: Record<InvitationStatus, string> = {
+  PENDING: "Pending",
+  ACCEPTED: "Accepted",
+  DECLINED: "Declined",
+  CANCELLED: "Cancelled",
+  EXPIRED: "Expired",
+};
+
 export type ContractStatus =
   "PENDING" | "ACTIVE" | "SUBMITTED" | "COMPLETED" | "CANCELLED" | "DISPUTED";
 
@@ -74,9 +85,78 @@ export const paymentStatusLabels: Record<PaymentStatus, string> = {
   REFUNDED: "Refunded",
 };
 
+export type DisputeStatus = "OPEN" | "RESOLVED" | "WITHDRAWN";
+
+export const disputeStatusLabels: Record<DisputeStatus, string> = {
+  OPEN: "Open",
+  RESOLVED: "Resolved",
+  WITHDRAWN: "Withdrawn",
+};
+
+export type DisputeResolution =
+  "REFUND_CLIENT" | "RELEASE_TO_FREELANCER" | "NO_ACTION";
+
+export const disputeResolutionLabels: Record<DisputeResolution, string> = {
+  REFUND_CLIENT: "Refunded to client",
+  RELEASE_TO_FREELANCER: "Released to freelancer",
+  NO_ACTION: "No action taken",
+};
+
+export type RefundStatus = "SUCCEEDED" | "FAILED" | "NO_PAYMENT";
+
+export const refundStatusLabels: Record<RefundStatus, string> = {
+  SUCCEEDED: "Refund succeeded",
+  FAILED: "Refund failed",
+  NO_PAYMENT: "No payment to refund",
+};
+
 export type BudgetType = "FIXED" | "HOURLY";
 
 export const budgetTypeLabels: Record<BudgetType, string> = {
   FIXED: "Fixed price",
   HOURLY: "Hourly",
 };
+
+export type Availability = "AVAILABLE" | "BUSY" | "NOT_AVAILABLE";
+
+export const availabilityLabels: Record<Availability, string> = {
+  AVAILABLE: "Available",
+  BUSY: "Busy",
+  NOT_AVAILABLE: "Not available",
+};
+
+export type CompanySize = "SOLO" | "SMALL" | "MEDIUM" | "LARGE";
+
+export const companySizeLabels: Record<CompanySize, string> = {
+  SOLO: "Solo",
+  SMALL: "Small",
+  MEDIUM: "Medium",
+  LARGE: "Large",
+};
+
+export type NotificationType =
+  | "NEW_APPLICATION"
+  | "APPLICATION_SHORTLISTED"
+  | "APPLICATION_REJECTED"
+  | "FREELANCER_HIRED"
+  | "CONTRACT_ACTIVATED"
+  | "WORK_SUBMITTED"
+  | "CONTRACT_COMPLETED"
+  | "PAYMENT_SUCCESSFUL"
+  | "NEW_REVIEW"
+  | "NEW_INVITATION"
+  | "INVITATION_ACCEPTED"
+  | "INVITATION_DECLINED"
+  | "NEW_MESSAGE"
+  | "DISPUTE_OPENED"
+  | "DISPUTE_RESOLVED";
+
+export type EntityType =
+  | "JOB"
+  | "APPLICATION"
+  | "CONTRACT"
+  | "PAYMENT"
+  | "REVIEW"
+  | "INVITATION"
+  | "CONVERSATION"
+  | "DISPUTE";
