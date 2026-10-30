@@ -1,10 +1,7 @@
 import type { AppNotification } from "@/types/notification";
 import type { UserRole } from "@/types/user";
 
-// Extracts the trailing UUID from a backend-provided link like
-// "/contracts/abc-123" or "/jobs/abc-123/applications" — used since the
-// backend's `link` field isn't role-prefixed and can't be used as-is.
-function extractId(link?: string): string | null {
+function extractId(link?: string | null): string | null {
   if (!link) return null;
   const match = link.match(
     /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,

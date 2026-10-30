@@ -1,5 +1,4 @@
 import { apiClient } from "@/lib/api-client";
-import type { CreateJobFormValues } from "@/features/jobs/schemas";
 import type { Job, JobListParams } from "@/types/job";
 import type { JobStatus } from "@/types/enums";
 
@@ -15,28 +14,19 @@ function buildQuery(params: object) {
 }
 
 function normalizeSavedJob(raw: any): Job {
-  const job = raw.job ?? raw;
-  return {
-    id: job.id,
-    title: job.title,
-    description: job.description,
-    category: job.category,
-    skills: job.skills ?? [],
-    budgetType: job.budgetType,
-    budgetMin: Number(job.budgetMin) || 0,
-    budgetMax: Number(job.budgetMax) || 0,
-    experienceLevel: job.experienceLevel,
-    deadline: job.deadline,
-    status: job.status,
-    clientId: job.clientId ?? job.client?.id ?? "",
-    clientName:
-      job.clientName ??
-      job.client?.name ??
-      job.client?.companyName ??
-      "Unknown Client",
-    applicantCount: job.applicantCount ?? job._count?.applications ?? 0,
-    createdAt: job.createdAt,
-  };
+  return { ...(raw.job ?? raw), isSaved: true };
+}
+
+interface JobPayload {
+  title: string;
+  description: string;
+  category: string;
+  skills: string[];
+  budgetType: string;
+  budgetMin: number;
+  budgetMax: number;
+  experienceLevel: string;
+  deadline?: string;
 }
 
 export const jobsService = {
@@ -48,34 +38,11 @@ export const jobsService = {
     const res = await apiClient.get<Job>(`/jobs/${jobId}`);
     return res.data;
   },
-  create: async (payload: {
-    title: string;
-    description: string;
-    category: string;
-    skills: string[];
-    budgetType: string;
-    budgetMin: number;
-    budgetMax: number;
-    experienceLevel: string;
-    deadline?: string;
-  }) => {
+  create: async (payload: JobPayload) => {
     const res = await apiClient.post<Job>("/jobs", payload);
     return res.data;
   },
-  update: async (
-    jobId: string,
-    payload: Partial<{
-      title: string;
-      description: string;
-      category: string;
-      skills: string[];
-      budgetType: string;
-      budgetMin: number;
-      budgetMax: number;
-      experienceLevel: string;
-      deadline?: string;
-    }>,
-  ) => {
+  update: async (jobId: string, payload: Partial<JobPayload>) => {
     const res = await apiClient.patch<Job>(`/jobs/${jobId}`, payload);
     return res.data;
   },

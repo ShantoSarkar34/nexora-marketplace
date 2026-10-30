@@ -14,13 +14,13 @@ import { applyApiFieldErrors } from "@/lib/apply-api-field-errors";
 import { ApiError } from "@/lib/api-client";
 import { useUpdateJob } from "@/hooks/use-jobs";
 import { experienceLevelLabels, jobCategoryLabels } from "@/types/enums";
+import { getJobSkillNames } from "@/features/jobs/utils";
 import {
   createJobSchema,
   type CreateJobFormInput,
   type CreateJobFormValues,
 } from "@/features/jobs/schemas";
 import type { Job } from "@/types/job";
-import { getJobSkillNames } from "../utils";
 
 export function EditJobForm({ job }: { job: Job }) {
   const updateJob = useUpdateJob(job.id);
@@ -41,7 +41,6 @@ export function EditJobForm({ job }: { job: Job }) {
       budgetMin: job.budgetMin,
       budgetMax: job.budgetMax,
       experienceLevel: job.experienceLevel,
-      deadline: job.deadline,
     },
   });
 
@@ -50,8 +49,9 @@ export function EditJobForm({ job }: { job: Job }) {
       await updateJob.mutateAsync(values);
       toast.success("Job updated.");
     } catch (error) {
-      if (error instanceof ApiError && error.errors)
+      if (error instanceof ApiError && error.errors) {
         applyApiFieldErrors(setError, error.errors);
+      }
     }
   }
 

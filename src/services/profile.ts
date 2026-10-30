@@ -10,43 +10,15 @@ import type {
   Experience,
   FreelancerProfile,
   PortfolioItem,
-  Skill,
 } from "@/types/profile";
 
-export interface FreelancerListItem {
-  id: string;
-  userId: string;
-  title: string | null;
-  bio: string | null;
-  hourlyRate: number | string | null;
-  skills: {
-    id: string;
-    skillId: string;
-    skill: {
-      id: string;
-      name: string;
-    };
-  }[];
-  user: {
-    name: string;
-    imageUrl: string | null;
-  };
-}
-
-export interface FreelancerListResponse {
-  freelancers: FreelancerListItem[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
+// The month picker gives "YYYY-MM", but the backend stores a real DateTime and
+// only accepts a full ISO string. Convert on the way out...
 function monthToIso(month: string) {
   return new Date(`${month}-01T00:00:00.000Z`).toISOString();
 }
 
+// ...and back on the way in, so the rest of the UI keeps working with "YYYY-MM".
 function isoToMonth(value: string) {
   return value.slice(0, 7);
 }
@@ -66,16 +38,17 @@ function normalizeExperience(raw: any): Experience {
 function normalizeFreelancerProfile(raw: any): FreelancerProfile {
   return {
     id: raw.id,
-    user: raw.user,
     userId: raw.userId,
     title: raw.title ?? "",
     bio: raw.bio ?? "",
-    hourlyRate: Number(raw.hourlyRate) || 0,
+    hourlyRate: raw.hourlyRate ?? 0,
+    user: raw?.user,
     completionPercentage: raw.completionPercentage ?? 0,
     skills: (raw.skills ?? []).map((s: any) => ({
       id: s.skillId ?? s.skill?.id ?? s.id,
       name: s.skill?.name ?? s.name ?? "",
     })),
+    // The backend uses plural keys for these two.
     experience: (raw.experiences ?? raw.experience ?? []).map(
       normalizeExperience,
     ),
@@ -84,29 +57,12 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
 }
 
 export const freelancerProfileService = {
-  getAll: async (page = 1, limit = 6) => {
-    const res = await apiClient.get<{
-      success: boolean;
-      message: string;
-      data: FreelancerListResponse;
-    }>(`/profiles/freelancer?page=${page}&limit=${limit}`);
-
-    return res.data.data;
-  },
-
-  getFeaturedTalent: async (page = 1, limit = 6) => {
-    const res = await apiClient.get<FreelancerListResponse>(
-      `/profiles/freelancer?page=${page}&limit=${limit}`,
-    );
-
-    return res.data;
-  },
-
   getMe: async () => {
     const res = await apiClient.get<any>("/profiles/freelancer/me");
     return normalizeFreelancerProfile(res.data);
   },
   create: async (payload: FreelancerBasicsValues) => {
+    // `name` belongs to the user account, not the freelancer profile.
     const { name: _name, ...profileFields } = payload;
     const res = await apiClient.post<any>(
       "/profiles/freelancer",
@@ -165,7 +121,7 @@ export const freelancerProfileService = {
     return {
       ...normalizeFreelancerProfile(res.data),
       name: res.data.name as string,
-      imageUrl: res.data.imageUrl as string | undefined,
+      imageUrl: (res.data.imageUrl ?? undefined) as string | undefined,
     };
   },
 };

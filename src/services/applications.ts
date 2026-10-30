@@ -21,24 +21,24 @@ export interface Application {
 }
 
 function normalizeApplication(raw: any): Application {
+  const job = raw.job ?? {};
+  const client = job.client ?? {};
   const freelancer = raw.freelancer ?? {};
   const freelancerProfile = freelancer.freelancerProfile ?? {};
-  const job = raw.job ?? {};
-  const client = raw.client ?? job.client ?? {};
 
   return {
     id: raw.id,
     jobId: raw.jobId ?? job.id,
-    jobTitle: raw.jobTitle ?? job.title ?? "Untitled job",
-    clientId: raw.clientId ?? job.clientId ?? client.id ?? "",
-    clientName: raw.clientName ?? client.name ?? client.companyName ?? "",
-    clientImageUrl: raw.clientImageUrl ?? client.imageUrl,
+    jobTitle: job.title ?? "Untitled job",
+    clientId: job.clientId ?? client.id ?? "",
+    clientName: client.name ?? "",
+    clientImageUrl: client.imageUrl ?? undefined,
     freelancerId: raw.freelancerId ?? freelancer.id ?? "",
-    freelancerName: raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
-    freelancerImageUrl: raw.freelancerImageUrl ?? freelancer.imageUrl,
-    freelancerTitle: raw.freelancerTitle ?? freelancerProfile.title ?? freelancer.title,
+    freelancerName: freelancer.name ?? "Unknown Freelancer",
+    freelancerImageUrl: freelancer.imageUrl ?? undefined,
+    freelancerTitle: freelancerProfile.title ?? undefined,
     coverLetter: raw.coverLetter ?? "",
-    proposedBudget: Number(raw.proposedBudget) || 0,
+    proposedBudget: raw.proposedBudget ?? 0,
     estimatedDeliveryDays: raw.estimatedDeliveryDays ?? 0,
     status: raw.status,
     createdAt: raw.createdAt,
@@ -92,7 +92,9 @@ export const applicationsService = {
   ) => {
     const res = await apiClient.patch<any>(
       `/applications/${applicationId}/status`,
-      { status },
+      {
+        status,
+      },
     );
     return normalizeApplication(res.data);
   },

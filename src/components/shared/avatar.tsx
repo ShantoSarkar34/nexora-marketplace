@@ -1,10 +1,10 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { getInitials } from "@/lib/get-initials";
+import Image from "next/image";
 
 interface AvatarProps {
   name: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   size?: "sm" | "md" | "lg";
   accent?: "brand" | "freelancer" | "client";
 }
@@ -14,7 +14,6 @@ const sizeClasses = {
   md: "h-10 w-10 text-sm",
   lg: "h-14 w-14 text-lg",
 };
-
 const imageSizes = {
   sm: 32,
   md: 40,
@@ -45,7 +44,6 @@ export function Avatar({
       />
     );
   }
-
   return (
     <span
       className={cn(

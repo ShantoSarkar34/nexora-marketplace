@@ -2,31 +2,34 @@ import { apiClient } from "@/lib/api-client";
 import type { Contract } from "@/types/contract";
 
 function normalizeContract(raw: any): Contract {
-  const freelancer = raw.freelancer ?? {};
-  const client = raw.client ?? {};
   const job = raw.job ?? {};
+  const client = raw.client ?? {};
+  const freelancer = raw.freelancer ?? {};
 
   return {
     id: raw.id,
     jobId: raw.jobId ?? job.id,
-    jobTitle: raw.jobTitle ?? job.title ?? "Untitled job",
+    applicationId: raw.applicationId ?? undefined,
+    jobTitle: job.title ?? "Untitled job",
+    jobStatus: job.status ?? undefined,
+    budgetType: job.budgetType ?? undefined,
     clientId: raw.clientId ?? client.id ?? "",
-    clientName: raw.clientName ?? client.name ?? "Unknown Client",
-    clientImageUrl: raw.clientImageUrl ?? client.imageUrl,
+    clientName: client.name ?? "Unknown Client",
+    clientImageUrl: client.imageUrl ?? undefined,
     freelancerId: raw.freelancerId ?? freelancer.id ?? "",
-    freelancerName:
-      raw.freelancerName ?? freelancer.name ?? "Unknown Freelancer",
-    freelancerImageUrl: raw.freelancerImageUrl ?? freelancer.imageUrl,
-    agreedBudget: Number(raw.agreedBudget) || 0,
+    freelancerName: freelancer.name ?? "Unknown Freelancer",
+    freelancerImageUrl: freelancer.imageUrl ?? undefined,
+    agreedBudget: raw.agreedBudget ?? 0,
     status: raw.status,
-    submissionNote: raw.submissionNote,
-    submissionUrl: raw.submissionUrl,
+    paymentStatus: raw.paymentStatus ?? null,
+    submissionNote: raw.submissionNote ?? undefined,
+    submissionUrl: raw.submissionUrl ?? undefined,
+    attachments: raw.attachments ?? [],
     createdAt: raw.createdAt,
-    activatedAt: raw.activatedAt,
-    submittedAt: raw.submittedAt,
-    completedAt: raw.completedAt,
-    cancelledAt: raw.cancelledAt,
-    cancelReason: raw.cancelReason,
+    submittedAt: raw.submittedAt ?? undefined,
+    completedAt: raw.completedAt ?? undefined,
+    cancelledAt: raw.cancelledAt ?? undefined,
+    cancelReason: raw.cancelReason ?? undefined,
   };
 }
 
