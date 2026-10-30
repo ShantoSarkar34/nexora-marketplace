@@ -9,6 +9,18 @@ export class ApiError extends Error {
     super(message);
     this.name = "ApiError";
   }
+
+  get formError(): string | undefined {
+    return this.errors?._form?.[0];
+  }
+}
+
+export function isSuspendedError(error: unknown): boolean {
+  return (
+    error instanceof ApiError &&
+    error.status === 403 &&
+    error.message.trim().toLowerCase() === "account suspended"
+  );
 }
 
 interface ApiSuccess<T> {
@@ -51,8 +63,6 @@ async function request<T>(
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
-    // Network failure (offline, CORS block, server unreachable) — status 0
-    // signals "couldn't even reach the server" vs. a real HTTP error code.
     throw new ApiError(
       0,
       "Unable to reach the server. Check your connection and try again.",

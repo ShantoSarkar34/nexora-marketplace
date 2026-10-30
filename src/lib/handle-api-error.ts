@@ -1,23 +1,34 @@
 import { toast } from "sonner";
 
-import { ApiError } from "@/lib/api-client";
+import { ApiError, isSuspendedError } from "@/lib/api-client";
 
 interface HandleApiErrorOptions {
+  source?: "query" | "mutation";
+  rateLimitMessage?: string;
   onUnauthorized?: () => void;
+  onSuspended?: () => void;
 }
 
 export function handleApiError(
   error: unknown,
-  options?: HandleApiErrorOptions,
+  options: HandleApiErrorOptions = {},
 ) {
   if (!(error instanceof ApiError)) {
     toast.error("Something went wrong. Please try again.");
     return;
   }
 
+  if (isSuspendedError(error)) {
+    options.onSuspended?.();
+    return;
+  }
+
   switch (error.status) {
     case 401:
-      options?.onUnauthorized?.();
+      if (options.source === "mutation") {
+        toast.error(error.message || "Please log in to continue.");
+      }
+      options.onUnauthorized?.();
       break;
     case 403:
       toast.error("You don't have permission to do that.");
@@ -26,12 +37,20 @@ export function handleApiError(
       toast.error("We couldn't find what you were looking for.");
       break;
     case 409:
-      // Conflict — spec calls this a warning, not a hard error
+      // Conflict is a warning, not a hard error.
       toast.warning(error.message);
       break;
     case 429:
       toast.warning(
-        error.message || "You're doing that too often — please wait a moment.",
+        options.rateLimitMessage ??
+          (error.message ||
+            "You're doing that too often. Please wait a moment."),
+      );
+      break;
+    case 502:
+    case 503:
+      toast.error(
+        "This feature is temporarily unavailable. Please try again later.",
       );
       break;
     case 0:
