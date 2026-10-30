@@ -1,4 +1,5 @@
 export type UserRole = "CLIENT" | "FREELANCER" | "ADMIN";
+export type AuthProvider = "LOCAL" | "GOOGLE";
 
 export interface AuthUser {
   id: string;
@@ -6,6 +7,7 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   isVerified: boolean;
-  imageUrl?: string;
+  provider: AuthProvider;
+  imageUrl?: string | null;
   createdAt: string;
 }

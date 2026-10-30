@@ -1,19 +1,16 @@
-export type NotificationType =
-  | "NEW_APPLICATION"
-  | "APPLICATION_SHORTLISTED"
-  | "APPLICATION_REJECTED"
-  | "FREELANCER_HIRED"
-  | "CONTRACT_ACTIVATED"
-  | "WORK_SUBMITTED"
-  | "CONTRACT_COMPLETED"
-  | "PAYMENT_SUCCESSFUL"
-  | "NEW_REVIEW";
+import type { EntityType, NotificationType } from "@/types/enums";
+
+export type { EntityType, NotificationType };
 
 export interface AppNotification {
   id: string;
   type: NotificationType;
+  title: string;
   message: string;
+  link?: string | null;
+  entityType?: EntityType | null;
+  entityId?: string | null;
+  meta?: Record<string, string> | null;
   isRead: boolean;
   createdAt: string;
-  link?: string;
 }

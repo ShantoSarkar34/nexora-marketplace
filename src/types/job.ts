@@ -1,4 +1,9 @@
-import type { BudgetType, ExperienceLevel, JobCategory, JobStatus } from "@/types/enums";
+import type {
+  BudgetType,
+  ExperienceLevel,
+  JobCategory,
+  JobStatus,
+} from "@/types/enums";
 
 export interface JobSkillRelation {
   id: string;
@@ -10,23 +15,38 @@ export interface JobSkillRelation {
   };
 }
 
+export interface JobClient {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  clientProfile?: { companyName?: string | null } | null;
+}
+
 export interface Job {
   id: string;
+  clientId: string;
   title: string;
   description: string;
   category: JobCategory;
-  skills: JobSkillRelation[];
   budgetType: BudgetType;
   budgetMin: number;
   budgetMax: number;
   experienceLevel: ExperienceLevel;
-  deadline?: string;
+  deadline?: string | null;
   status: JobStatus;
-  clientId: string;
-  clientName: string;
-  applicantCount: number;
   createdAt: string;
-  isSaved?: boolean;
+  updatedAt?: string;
+  skills: JobSkillRelation[];
+  client?: JobClient;
+  clientName: string;
+  clientImageUrl?: string | null;
+  companyName?: string | null;
+  applicantCount: number;
+  // Real values need credentials; logged-out requests get false.
+  isSaved: boolean;
+  hasApplied: boolean;
+  // Only present on GET /jobs/saved/me.
+  savedAt?: string;
 }
 
 export interface JobListParams {
