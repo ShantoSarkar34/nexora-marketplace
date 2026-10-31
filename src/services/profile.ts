@@ -5,6 +5,7 @@ import type {
   FreelancerBasicsValues,
   PortfolioInput,
 } from "@/features/profile/schemas";
+import type { Availability, ExperienceLevel } from "@/types/enums";
 import type {
   ClientProfile,
   Experience,
@@ -12,13 +13,56 @@ import type {
   PortfolioItem,
 } from "@/types/profile";
 
-// The month picker gives "YYYY-MM", but the backend stores a real DateTime and
-// only accepts a full ISO string. Convert on the way out...
+export interface FreelancerListItem {
+  id: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+  };
+  title: string;
+  bio: string;
+  hourlyRate: number;
+  experienceLevel?: ExperienceLevel | null;
+  availability?: Availability | null;
+  skills: { id: string; skill: { id: string; name: string } }[];
+  averageRating: number;
+  totalReviews: number;
+  completionPercentage: number;
+}
+
+function normalizeListItem(raw: any): FreelancerListItem {
+  return {
+    id: raw.id ?? raw.userId,
+    userId: raw.userId,
+    user: raw.user ?? {
+      id: raw.userId,
+      name: raw.name ?? "",
+      imageUrl: raw.imageUrl ?? null,
+    },
+    title: raw.title ?? "",
+    bio: raw.bio ?? "",
+    hourlyRate: raw.hourlyRate ?? 0,
+    experienceLevel: raw.experienceLevel ?? null,
+    availability: raw.availability ?? null,
+    skills: (raw.skills ?? []).map((s: any) => ({
+      id: s.id,
+      skill: {
+        id: s.skill?.id ?? s.id,
+        name: s.skill?.name ?? s.name ?? "",
+      },
+    })),
+    averageRating: raw.averageRating ?? 0,
+    totalReviews: raw.totalReviews ?? 0,
+    completionPercentage: raw.completionPercentage ?? 0,
+  };
+}
+
 function monthToIso(month: string) {
   return new Date(`${month}-01T00:00:00.000Z`).toISOString();
 }
 
-// ...and back on the way in, so the rest of the UI keeps working with "YYYY-MM".
 function isoToMonth(value: string) {
   return value.slice(0, 7);
 }
@@ -39,10 +83,14 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
   return {
     id: raw.id,
     userId: raw.userId,
+    user: raw.user ?? {
+      id: raw.userId,
+      name: raw.name ?? "",
+      imageUrl: raw.imageUrl ?? null,
+    },
     title: raw.title ?? "",
     bio: raw.bio ?? "",
     hourlyRate: raw.hourlyRate ?? 0,
-    user: raw?.user,
     completionPercentage: raw.completionPercentage ?? 0,
     skills: (raw.skills ?? []).map((s: any) => ({
       id: s.skillId ?? s.skill?.id ?? s.id,
@@ -57,6 +105,12 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
 }
 
 export const freelancerProfileService = {
+  getFeaturedTalent: async (page = 1, limit = 6) => {
+    const res = await apiClient.get<any[]>(
+      `/profiles/freelancer?sortBy=rating&page=${page}&limit=${limit}`,
+    );
+    return { freelancers: res.data.map(normalizeListItem), meta: res.meta };
+  },
   getMe: async () => {
     const res = await apiClient.get<any>("/profiles/freelancer/me");
     return normalizeFreelancerProfile(res.data);
