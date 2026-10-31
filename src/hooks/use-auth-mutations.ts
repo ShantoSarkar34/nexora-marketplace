@@ -4,6 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { authQueryKey } from "@/hooks/use-auth";
 import {
+  accountService,
+  type ChangePasswordPayload,
+  type DeleteAccountPayload,
+} from "@/services/account";
+import {
   authService,
   type LoginPayload,
   type RegisterPayload,
@@ -95,9 +100,37 @@ export function useResetPassword() {
 export function useUpdateMe() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { name?: string }) => authService.updateMe(payload),
+    mutationFn: (payload: { name: string }) => accountService.updateMe(payload),
     // Refetch /auth/me rather than trusting the shape of the PATCH response.
     onSuccess: () => qc.invalidateQueries({ queryKey: authQueryKey }),
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (payload: ChangePasswordPayload) =>
+      accountService.changePassword(payload),
+    meta: {
+      rateLimitMessage:
+        "Too many password change attempts. Please wait about 15 minutes and try again.",
+    },
+  });
+}
+
+export function useDeleteAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: DeleteAccountPayload) =>
+      accountService.deleteAccount(payload),
+    meta: {
+      rateLimitMessage:
+        "Too many attempts. Please wait about 15 minutes and try again.",
+    },
+    onSuccess: () => {
+      // The server clears the cookie; drop everything we cached for this user.
+      qc.setQueryData(authQueryKey, null);
+      qc.clear();
+    },
   });
 }
 
