@@ -16,8 +16,9 @@ export function useApplyToJob() {
       jobId: string;
       values: ApplyJobFormValues;
     }) => applicationsService.apply(jobId, values),
-    onSuccess: (_data, { jobId }) => {
-      qc.invalidateQueries({ queryKey: ["jobs", "detail", jobId] });
+    onSuccess: () => {
+      // Every job list and detail carries a hasApplied flag, so refresh them all.
+      qc.invalidateQueries({ queryKey: ["jobs"] });
       qc.invalidateQueries({ queryKey: ["applications"] });
     },
   });
@@ -59,6 +60,8 @@ export function useWithdrawApplication() {
       qc.invalidateQueries({
         queryKey: ["applications", "detail", applicationId],
       });
+      // hasApplied on jobs may change after a withdrawal.
+      qc.invalidateQueries({ queryKey: ["jobs"] });
     },
   });
 }

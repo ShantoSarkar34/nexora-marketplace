@@ -1,7 +1,17 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
-import { Briefcase, Bookmark, Clock, DollarSign, Users } from "lucide-react";
+import {
+  Bookmark,
+  Briefcase,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
@@ -9,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import { experienceLevelLabels } from "@/types/enums";
+import { experienceLevelLabels, jobStatusLabels } from "@/types/enums";
 import { useJob, useSaveJob, useUnsaveJob } from "@/hooks/use-jobs";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -19,9 +29,17 @@ import {
   budgetTypeLabel,
   getJobSkillNames,
 } from "@/features/jobs/utils";
+import { JobPoster } from "@/features/jobs/components/job-poster";
 import { AIMatchCard } from "@/features/ai-match/components/ai-match-card";
 import { ApplyJobDialog } from "@/features/applications/components/apply-job-dialog";
-import { useState } from "react";
+
+function formatDeadline(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export default function JobDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -66,16 +84,17 @@ export default function JobDetailsPage() {
           <div>
             <div className="flex items-center gap-2">
               <Badge variant={job.status === "OPEN" ? "success" : "neutral"}>
-                {job.status}
+                {jobStatusLabels[job.status]}
               </Badge>
               <span className="text-text-secondary text-xs">
                 Posted {timeAgo(job.createdAt)}
               </span>
             </div>
             <h1 className="mt-2">{job.title}</h1>
-            <p className="text-text-secondary mt-1 text-sm">
-              {job.clientName} · {categoryLabel(job)}
-            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <JobPoster job={job} size="md" />
+              <Badge variant="neutral">{categoryLabel(job)}</Badge>
+            </div>
           </div>
 
           <Card>
@@ -138,9 +157,32 @@ export default function JobDetailsPage() {
                   </p>
                 </div>
               </div>
+              {job.deadline && (
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="text-text-secondary h-4 w-4" />
+                  <div>
+                    <p className="text-text-secondary text-xs">Apply by</p>
+                    <p className="text-text-primary text-sm font-semibold">
+                      {formatDeadline(job.deadline)}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {job.status === "OPEN" && (
+            {isFreelancer && job.hasApplied ? (
+              <div className="mt-6 space-y-2">
+                <div className="bg-status-active/10 text-text-primary flex items-center gap-2 rounded-md px-3 py-2 text-sm">
+                  <CheckCircle2 className="text-status-active h-4 w-4 shrink-0" />
+                  You&apos;ve applied to this job
+                </div>
+                <Link href="/freelancer/applications" className="block">
+                  <Button variant="secondary" className="w-full">
+                    View my applications
+                  </Button>
+                </Link>
+              </div>
+            ) : job.status === "OPEN" ? (
               <>
                 {isFreelancer ? (
                   <Button
@@ -176,6 +218,10 @@ export default function JobDetailsPage() {
                   </Button>
                 )}
               </>
+            ) : (
+              <p className="text-text-secondary mt-6 text-sm">
+                This job is no longer accepting applications.
+              </p>
             )}
           </Card>
 
@@ -185,7 +231,7 @@ export default function JobDetailsPage() {
         </div>
       </div>
 
-      {isFreelancer && (
+      {isFreelancer && !job.hasApplied && (
         <ApplyJobDialog
           job={job}
           open={applyOpen}

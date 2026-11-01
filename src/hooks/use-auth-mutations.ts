@@ -23,7 +23,11 @@ export function useLogin() {
       rateLimitMessage:
         "Too many login attempts. Please wait about 15 minutes and try again.",
     },
-    onSuccess: (user) => qc.setQueryData(authQueryKey, user),
+    onSuccess: (user) => {
+      qc.setQueryData(authQueryKey, user);
+      // Job lists cached while logged out carry isSaved / hasApplied = false.
+      qc.invalidateQueries({ queryKey: ["jobs"] });
+    },
   });
 }
 
@@ -53,7 +57,10 @@ export function useGoogleLogin() {
   return useMutation({
     mutationFn: ({ idToken, role }: { idToken: string; role?: UserRole }) =>
       authService.googleLogin(idToken, role),
-    onSuccess: (user) => qc.setQueryData(authQueryKey, user),
+    onSuccess: (user) => {
+      qc.setQueryData(authQueryKey, user);
+      qc.invalidateQueries({ queryKey: ["jobs"] });
+    },
   });
 }
 
