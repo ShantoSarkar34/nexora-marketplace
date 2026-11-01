@@ -6,7 +6,6 @@ import {
   BriefcaseBusiness,
   ExternalLink,
   Globe,
-  Mail,
   Star,
   UserRound,
 } from "lucide-react";
@@ -14,14 +13,23 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-
-import { freelancerProfileService } from "@/services/profile";
+import { ProfileMetaBadges } from "@/features/profile/components/profile-meta-badges";
 import { RatingSummary } from "@/features/reviews/components/rating-summary";
-import { useAuth } from "@/hooks/use-auth";
+import { ReviewList } from "@/features/reviews/components/review-list";
+import { getInitials } from "@/lib/get-initials";
+import { freelancerProfileService } from "@/services/profile";
+
+// "2025-08" -> "Aug 2025"
+function formatMonth(value: string) {
+  if (!value) return "";
+  return new Date(`${value}-01`).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+}
 
 export default function FreelancerPublicProfilePage() {
   const params = useParams<{ id: string }>();
-  const { user } = useAuth();
 
   const {
     data: profile,
@@ -57,8 +65,7 @@ export default function FreelancerPublicProfilePage() {
     );
   }
 
-  const name = profile?.name || "Freelancer";
-  const email = user?.email;
+  const name = profile.name || "Freelancer";
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -69,22 +76,17 @@ export default function FreelancerPublicProfilePage() {
         <div className="px-5 pb-6 sm:px-8">
           <div className="-mt-10 flex flex-col gap-5 sm:-mt-12 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
-              {/* Avatar */}
+              {/* Avatar: the profile owner's photo, never the viewer's */}
               <div className="bg-surface border-border relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 shadow-sm sm:h-24 sm:w-24">
-                {user?.imageUrl ? (
+                {profile.imageUrl ? (
                   <img
-                    src={user.imageUrl}
+                    src={profile.imageUrl}
                     alt={name}
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="bg-client-500/10 text-client-500 flex h-full w-full items-center justify-center text-2xl font-semibold">
-                    {name
-                      .split(" ")
-                      .map((part: any) => part[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()}
+                  <div className="bg-freelancer-500/10 text-freelancer-500 flex h-full w-full items-center justify-center text-2xl font-semibold">
+                    {getInitials(name)}
                   </div>
                 )}
               </div>
@@ -97,6 +99,13 @@ export default function FreelancerPublicProfilePage() {
                 <p className="text-text-secondary mt-1 text-sm sm:text-base">
                   {profile.title || "Freelancer"}
                 </p>
+
+                <div className="mt-2">
+                  <ProfileMetaBadges
+                    availability={profile.availability}
+                    experienceLevel={profile.experienceLevel}
+                  />
+                </div>
               </div>
             </div>
 
@@ -114,14 +123,7 @@ export default function FreelancerPublicProfilePage() {
 
           {/* Rating */}
           <div className="mt-5 flex flex-wrap items-center gap-4">
-            <RatingSummary userId={profile.userId} />
-
-            {email && (
-              <div className="text-text-secondary flex items-center gap-1.5 text-sm">
-                <Mail className="h-4 w-4" />
-                <span>{email}</span>
-              </div>
-            )}
+            <RatingSummary userId={params.id} />
           </div>
         </div>
       </Card>
@@ -133,9 +135,7 @@ export default function FreelancerPublicProfilePage() {
           <Card>
             <div className="flex items-center gap-2">
               <UserRound className="text-brand-600 h-5 w-5" />
-              <h2 className="text-text-primary text-lg font-semibold">
-                About
-              </h2>
+              <h2 className="text-text-primary text-lg font-semibold">About</h2>
             </div>
 
             <p className="text-text-secondary mt-4 text-sm leading-7">
@@ -153,14 +153,14 @@ export default function FreelancerPublicProfilePage() {
                 </h2>
               </div>
 
-              {profile.skills?.length > 0 && (
+              {profile.skills.length > 0 && (
                 <span className="text-text-secondary text-xs">
                   {profile.skills.length} skills
                 </span>
               )}
             </div>
 
-            {profile.skills?.length > 0 ? (
+            {profile.skills.length > 0 ? (
               <div className="mt-4 flex flex-wrap gap-2">
                 {profile.skills.map((skill) => (
                   <Badge key={skill.id} variant="brand">
@@ -184,7 +184,7 @@ export default function FreelancerPublicProfilePage() {
               </h2>
             </div>
 
-            {profile.experience?.length > 0 ? (
+            {profile.experience.length > 0 ? (
               <div className="mt-5 space-y-6">
                 {profile.experience.map((experience, index) => (
                   <div
@@ -206,10 +206,10 @@ export default function FreelancerPublicProfilePage() {
                     </p>
 
                     <p className="text-text-secondary mt-1 text-xs">
-                      {experience.startDate} –{" "}
-                      {experience.isCurrent
+                      {formatMonth(experience.startDate)} –{" "}
+                      {experience.isCurrent || !experience.endDate
                         ? "Present"
-                        : experience.endDate || "Present"}
+                        : formatMonth(experience.endDate)}
                     </p>
 
                     {experience.description && (
@@ -236,14 +236,13 @@ export default function FreelancerPublicProfilePage() {
               </h2>
             </div>
 
-            {profile.portfolio?.length > 0 ? (
+            {profile.portfolio.length > 0 ? (
               <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {profile.portfolio.map((item) => (
                   <div
                     key={item.id}
                     className="border-border overflow-hidden rounded-lg border"
                   >
-                    {/* Portfolio image */}
                     {item.imageUrl ? (
                       <div className="bg-surface-muted aspect-video overflow-hidden">
                         <img
@@ -303,21 +302,17 @@ export default function FreelancerPublicProfilePage() {
                 </p>
               </div>
 
-              <RatingSummary userId={profile.userId} />
+              <RatingSummary userId={params.id} />
             </div>
 
             <div className="border-border mt-5 border-t pt-5">
-              <p className="text-text-secondary text-sm">
-                Reviews will appear here when clients leave feedback for this
-                freelancer.
-              </p>
+              <ReviewList userId={params.id} />
             </div>
           </Card>
         </div>
 
         {/* Sidebar */}
         <aside className="space-y-6">
-          {/* Profile overview */}
           <Card>
             <h2 className="text-text-primary text-base font-semibold">
               Profile Overview
@@ -367,7 +362,7 @@ export default function FreelancerPublicProfilePage() {
               <div className="border-border border-t pt-4">
                 <p className="text-text-secondary text-xs">Skills</p>
                 <p className="text-text-primary mt-1 text-sm font-medium">
-                  {profile.skills?.length || 0}
+                  {profile.skills.length}
                 </p>
               </div>
 
@@ -376,40 +371,18 @@ export default function FreelancerPublicProfilePage() {
                   Portfolio projects
                 </p>
                 <p className="text-text-primary mt-1 text-sm font-medium">
-                  {profile.portfolio?.length || 0}
+                  {profile.portfolio.length}
                 </p>
               </div>
 
               <div className="border-border border-t pt-4">
                 <p className="text-text-secondary text-xs">Experience</p>
                 <p className="text-text-primary mt-1 text-sm font-medium">
-                  {profile.experience?.length || 0}{" "}
-                  {profile.experience?.length === 1 ? "position" : "positions"}
+                  {profile.experience.length}{" "}
+                  {profile.experience.length === 1 ? "position" : "positions"}
                 </p>
               </div>
             </div>
-          </Card>
-
-          {/* Contact */}
-          <Card>
-            <h2 className="text-text-primary text-base font-semibold">
-              Interested in working together?
-            </h2>
-
-            <p className="text-text-secondary mt-2 text-sm leading-6">
-              Review this freelancer's skills, experience, and portfolio before
-              starting a project.
-            </p>
-
-            {email && (
-              <a
-                href={`mailto:${email}`}
-                className="bg-brand-600 hover:bg-brand-700 mt-5 flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white transition-colors"
-              >
-                <Mail className="h-4 w-4" />
-                Contact Freelancer
-              </a>
-            )}
           </Card>
         </aside>
       </div>

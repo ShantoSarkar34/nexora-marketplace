@@ -10,13 +10,16 @@ import { Spinner } from "@/components/ui/spinner";
 import { RatingSummary } from "@/features/reviews/components/rating-summary";
 import { ReviewList } from "@/features/reviews/components/review-list";
 import { clientProfileService } from "@/services/profile";
+import { companySizeLabels } from "@/types/enums";
 import { getInitials } from "@/lib/get-initials";
-import { useAuth } from "@/hooks/use-auth";
 
 export default function ClientPublicProfilePage() {
   const params = useParams<{ id: string }>();
-  const { user } = useAuth();
-  const { data: profile, isLoading, isError } = useQuery({
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["client-profile", "public", params.id],
     queryFn: () => clientProfileService.getPublic(params.id),
   });
@@ -31,27 +34,34 @@ export default function ClientPublicProfilePage() {
 
   if (isError || !profile) notFound();
 
-  console.log(profile)
+  const displayName = profile.companyName || profile.name;
+  const sizeLabel = profile.companySize
+    ? (companySizeLabels[profile.companySize] ?? profile.companySize)
+    : null;
+  const hasMeta = !!(sizeLabel || profile.foundedYear || profile.location);
+  const hasLinks = !!(
+    profile.website ||
+    profile.linkedinUrl ||
+    profile.twitterUrl
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-       <Card>
-        <div className="border-brand-500/30 flex items-center gap-4 border-b pb-4">
-         <div className="bg-client-500/10 text-client-500 flex h-16 w-16 items-center justify-center rounded-full text-xl font-semibold">
-            {user?.imageUrl ? (
-              <img
-                src={user.imageUrl}
-                alt={profile.companyName}
-                className="border-brand-600/70 rounded-full border-2 object-cover"
-              />
-            ) : (
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-client-500/10 text-xl font-semibold text-client-500">
-                {getInitials(profile.companyName)}
-              </span>
-            )}
-          </div>
+      <Card>
+        <div className="flex items-center gap-4">
+          {profile.imageUrl ? (
+            <img
+              src={profile.imageUrl}
+              alt={displayName}
+              className="border-brand-600/70 h-16 w-16 shrink-0 rounded-full border-2 object-cover"
+            />
+          ) : (
+            <span className="bg-client-500/10 text-client-500 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-semibold">
+              {getInitials(displayName)}
+            </span>
+          )}
           <div>
-            <h1 className="text-xl">{profile.companyName || profile.name}</h1>
+            <h1 className="text-xl">{displayName}</h1>
             {profile.industry && (
               <p className="text-text-secondary text-sm">{profile.industry}</p>
             )}
@@ -60,7 +70,21 @@ export default function ClientPublicProfilePage() {
             </div>
           </div>
         </div>
-        {profile.website && (
+
+        {hasMeta && (
+          <div className="text-text-secondary border-border mt-4 flex flex-wrap gap-4 border-t pt-4 text-sm">
+            {sizeLabel && <span>Company size: {sizeLabel}</span>}
+            {profile.foundedYear && <span>Founded {profile.foundedYear}</span>}
+            {profile.location && (
+              <span className="flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5" />
+                {profile.location}
+              </span>
+            )}
+          </div>
+        )}
+
+        {hasLinks && (
           <div className="mt-3 flex flex-wrap gap-4 text-sm">
             {profile.website && (
               <a
@@ -99,7 +123,6 @@ export default function ClientPublicProfilePage() {
         )}
       </Card>
 
-{/* Review  */}
       <Card className="mt-6">
         <h3>Reviews</h3>
         <div className="mt-4">
@@ -110,7 +133,7 @@ export default function ClientPublicProfilePage() {
       {profile.about && (
         <Card className="mt-6">
           <h3>About</h3>
-          <p className="mt-3 text-sm text-text-secondary">{profile.about}</p>
+          <p className="text-text-secondary mt-3 text-sm">{profile.about}</p>
         </Card>
       )}
     </div>
