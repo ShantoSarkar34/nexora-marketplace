@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { JobPoster } from "@/features/jobs/components/job-poster";
 import { cn } from "@/lib/utils";
 import { experienceLevelLabels } from "@/types/enums";
 import {
@@ -59,9 +60,12 @@ export function JobCard({ job }: { job: Job }) {
                 {job.title}
               </h3>
             </Link>
-            <p className="text-text-secondary mt-1 text-xs">
-              {job.clientName} · {timeAgo(job.createdAt)}
-            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+              <JobPoster job={job} compact />
+              <span className="text-text-secondary text-xs">
+                · {timeAgo(job.createdAt)}
+              </span>
+            </div>
           </div>
           <button
             onClick={toggleSave}
@@ -104,7 +108,10 @@ export function JobCard({ job }: { job: Job }) {
               {experienceLevelLabels[job.experienceLevel]}
             </span>
           </div>
-          <Badge variant="neutral">{categoryLabel(job)}</Badge>
+          <div className="flex items-center gap-2">
+            {job.hasApplied && <Badge variant="success">Applied</Badge>}
+            <Badge variant="neutral">{categoryLabel(job)}</Badge>
+          </div>
         </div>
       </Card>
     </motion.div>
