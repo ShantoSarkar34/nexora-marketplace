@@ -13,6 +13,9 @@ import type {
   PortfolioItem,
 } from "@/types/profile";
 
+// One card in the freelancer directory / featured talent list. The shape
+// matches what the home components read (nested `user`, skills as relation
+// rows). normalizeListItem builds it from the flat v2 directory response.
 export interface FreelancerListItem {
   id: string;
   userId: string;
@@ -46,6 +49,7 @@ function normalizeListItem(raw: any): FreelancerListItem {
     hourlyRate: raw.hourlyRate ?? 0,
     experienceLevel: raw.experienceLevel ?? null,
     availability: raw.availability ?? null,
+    // v2 sends flat { id, name }; older shapes send { id, skill: { name } }.
     skills: (raw.skills ?? []).map((s: any) => ({
       id: s.id,
       skill: {
@@ -59,10 +63,13 @@ function normalizeListItem(raw: any): FreelancerListItem {
   };
 }
 
+// The month picker gives "YYYY-MM", but the backend stores a real DateTime and
+// only accepts a full ISO string. Convert on the way out...
 function monthToIso(month: string) {
   return new Date(`${month}-01T00:00:00.000Z`).toISOString();
 }
 
+// ...and back on the way in, so the rest of the UI keeps working with "YYYY-MM".
 function isoToMonth(value: string) {
   return value.slice(0, 7);
 }
@@ -83,6 +90,8 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
   return {
     id: raw.id,
     userId: raw.userId,
+    // GET /profiles/freelancer/me doesn't return `user`, so build it from the
+    // flat fields the API does send.
     user: raw.user ?? {
       id: raw.userId,
       name: raw.name ?? "",
@@ -91,7 +100,12 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
     title: raw.title ?? "",
     bio: raw.bio ?? "",
     hourlyRate: raw.hourlyRate ?? 0,
+    experienceLevel: raw.experienceLevel ?? null,
+    availability: raw.availability ?? null,
     completionPercentage: raw.completionPercentage ?? 0,
+    // Skills come back as join rows: { id, skillId, skill: { id, name } }.
+    // We normalize to { id, name } where `id` is the real skillId, the value
+    // DELETE /skills/:skillId expects.
     skills: (raw.skills ?? []).map((s: any) => ({
       id: s.skillId ?? s.skill?.id ?? s.id,
       name: s.skill?.name ?? s.name ?? "",
@@ -104,7 +118,30 @@ function normalizeFreelancerProfile(raw: any): FreelancerProfile {
   };
 }
 
+// `name` belongs to the user account, not the freelancer profile. The enum
+// fields reject "", so leave them out when nothing is chosen.
+function toFreelancerPayload(values: Partial<FreelancerBasicsValues>) {
+  const { name: _name, experienceLevel, availability, ...rest } = values;
+  return {
+    ...rest,
+    ...(experienceLevel ? { experienceLevel } : {}),
+    ...(availability ? { availability } : {}),
+  };
+}
+
+// The form keeps the founded year as text; the API wants a number. companySize
+// is an enum, so "" is left out.
+function toClientPayload(values: Partial<ClientBasicsValues>) {
+  const { foundedYear, companySize, ...rest } = values;
+  return {
+    ...rest,
+    ...(companySize ? { companySize } : {}),
+    ...(foundedYear ? { foundedYear: Number(foundedYear) } : {}),
+  };
+}
+
 export const freelancerProfileService = {
+  // Top-rated freelancers, paginated. Used by the homepage and directory hooks.
   getFeaturedTalent: async (page = 1, limit = 6) => {
     const res = await apiClient.get<any[]>(
       `/profiles/freelancer?sortBy=rating&page=${page}&limit=${limit}`,
@@ -116,19 +153,16 @@ export const freelancerProfileService = {
     return normalizeFreelancerProfile(res.data);
   },
   create: async (payload: FreelancerBasicsValues) => {
-    // `name` belongs to the user account, not the freelancer profile.
-    const { name: _name, ...profileFields } = payload;
     const res = await apiClient.post<any>(
       "/profiles/freelancer",
-      profileFields,
+      toFreelancerPayload(payload),
     );
     return normalizeFreelancerProfile(res.data);
   },
   update: async (payload: Partial<FreelancerBasicsValues>) => {
-    const { name: _name, ...profileFields } = payload;
     const res = await apiClient.patch<any>(
       "/profiles/freelancer/me",
-      profileFields,
+      toFreelancerPayload(payload),
     );
     return normalizeFreelancerProfile(res.data);
   },
@@ -188,20 +222,20 @@ export const clientProfileService = {
   create: async (payload: ClientBasicsValues) => {
     const res = await apiClient.post<ClientProfile>(
       "/profiles/client",
-      payload,
+      toClientPayload(payload),
     );
     return res.data;
   },
   update: async (payload: Partial<ClientBasicsValues>) => {
     const res = await apiClient.patch<ClientProfile>(
       "/profiles/client/me",
-      payload,
+      toClientPayload(payload),
     );
     return res.data;
   },
   getPublic: async (userId: string) => {
     const res = await apiClient.get<
-      ClientProfile & { name: string; imageUrl?: string }
+      ClientProfile & { name: string; imageUrl?: string | null }
     >(`/profiles/client/${userId}`);
     return res.data;
   },

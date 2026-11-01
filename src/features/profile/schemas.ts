@@ -1,13 +1,21 @@
 import { z } from "zod";
 
+const experienceLevelValues = ["ENTRY", "INTERMEDIATE", "EXPERT"] as const;
+const availabilityValues = ["AVAILABLE", "BUSY", "NOT_AVAILABLE"] as const;
+const companySizeValues = ["SOLO", "SMALL", "MEDIUM", "LARGE"] as const;
+
 export const freelancerBasicsSchema = z.object({
   name: z.string().min(2, "Name is required"),
   title: z.string().min(3, "Title is required"),
   bio: z.string().min(20, "Bio should be at least 20 characters"),
   hourlyRate: z.coerce.number().positive("Enter a valid rate"),
+  experienceLevel: z.enum(experienceLevelValues).optional().or(z.literal("")),
+  availability: z.enum(availabilityValues).optional().or(z.literal("")),
 });
 export type FreelancerBasicsInput = z.input<typeof freelancerBasicsSchema>;
 export type FreelancerBasicsValues = z.output<typeof freelancerBasicsSchema>;
+
+const currentYear = new Date().getFullYear();
 
 export const clientBasicsSchema = z.object({
   companyName: z
@@ -20,7 +28,7 @@ export const clientBasicsSchema = z.object({
     .min(2, "Industry is required")
     .optional()
     .or(z.literal("")),
-  companySize: z.string().optional().or(z.literal("")),
+  companySize: z.enum(companySizeValues).optional().or(z.literal("")),
   website: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   about: z
     .string()
@@ -28,12 +36,17 @@ export const clientBasicsSchema = z.object({
     .optional()
     .or(z.literal("")),
   location: z.string().optional().or(z.literal("")),
-  foundedYear: z.coerce
-    .number()
-    .int()
-    .min(1800, "Enter a valid year")
-    .max(new Date().getFullYear(), "Enter a valid year")
-    .optional(),
+  foundedYear: z
+    .string()
+    .optional()
+    .refine(
+      (value) =>
+        !value ||
+        (/^\d{4}$/.test(value) &&
+          Number(value) >= 1800 &&
+          Number(value) <= currentYear),
+      "Enter a valid year",
+    ),
   linkedinUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   twitterUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
 });
@@ -61,4 +74,5 @@ export const portfolioSchema = z.object({
   projectUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   imageUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
 });
+
 export type PortfolioInput = z.infer<typeof portfolioSchema>;

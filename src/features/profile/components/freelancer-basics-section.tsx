@@ -9,9 +9,11 @@ import { Camera } from "lucide-react";
 import { EditableSection } from "@/features/profile/components/editable-section";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { AvatarUploadDialog } from "@/features/profile/components/avatar-upload-dialog";
+import { ProfileMetaBadges } from "@/features/profile/components/profile-meta-badges";
 import { applyApiFieldErrors } from "@/lib/apply-api-field-errors";
 import { ApiError } from "@/lib/api-client";
 import { useUpdateFreelancerBasics } from "@/hooks/use-freelancer-profile";
@@ -21,6 +23,7 @@ import {
   type FreelancerBasicsInput,
   type FreelancerBasicsValues,
 } from "@/features/profile/schemas";
+import { availabilityLabels, experienceLevelLabels } from "@/types/enums";
 import type { AuthUser } from "@/types/user";
 import type { FreelancerProfile } from "@/types/profile";
 import { getInitials } from "@/lib/get-initials";
@@ -53,6 +56,14 @@ export function FreelancerBasicsSection({ user, profile }: Props) {
               <p className="text-text-secondary text-sm">{profile.title}</p>
             </div>
           </div>
+
+          <div className="mt-3">
+            <ProfileMetaBadges
+              availability={profile.availability}
+              experienceLevel={profile.experienceLevel}
+            />
+          </div>
+
           <p className="text-text-secondary mt-4 text-sm">{profile.bio}</p>
           <p className="text-text-primary mt-4 text-sm font-medium">
             ${profile.hourlyRate}/hr
@@ -83,17 +94,25 @@ function BasicsForm({ user, profile, onDone }: Props & { onDone: () => void }) {
       title: profile.title,
       bio: profile.bio,
       hourlyRate: profile.hourlyRate,
+      availability: profile.availability ?? "AVAILABLE",
+      experienceLevel: profile.experienceLevel ?? "",
     },
   });
 
   async function onSubmit(values: FreelancerBasicsValues) {
     try {
+      // Title, bio, rate, level and availability live on the freelancer
+      // profile. The service leaves empty enum values out of the request.
       await updateBasics.mutateAsync({
         title: values.title,
         bio: values.bio,
         hourlyRate: values.hourlyRate,
+        availability: values.availability,
+        experienceLevel: values.experienceLevel,
       });
 
+      // The name lives on the user account, so only touch that endpoint when
+      // it actually changed.
       const newName = values.name.trim();
       if (newName !== user.name) {
         await updateMe.mutateAsync({ name: newName });
@@ -165,15 +184,52 @@ function BasicsForm({ user, profile, onDone }: Props & { onDone: () => void }) {
             </p>
           )}
         </div>
-        <div>
-          <Label htmlFor="hourlyRate">Hourly rate ($)</Label>
-          <Input id="hourlyRate" type="number" {...register("hourlyRate")} />
-          {errors.hourlyRate && (
-            <p className="text-status-error mt-1 text-xs">
-              {errors.hourlyRate.message}
-            </p>
-          )}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div>
+            <Label htmlFor="hourlyRate">Hourly rate ($)</Label>
+            <Input id="hourlyRate" type="number" {...register("hourlyRate")} />
+            {errors.hourlyRate && (
+              <p className="text-status-error mt-1 text-xs">
+                {errors.hourlyRate.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="availability">Availability</Label>
+            <Select id="availability" {...register("availability")}>
+              {Object.entries(availabilityLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+            {errors.availability && (
+              <p className="text-status-error mt-1 text-xs">
+                {errors.availability.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="experienceLevel">Experience level</Label>
+            <Select id="experienceLevel" {...register("experienceLevel")}>
+              <option value="" disabled={!!profile.experienceLevel}>
+                Not set
+              </option>
+              {Object.entries(experienceLevelLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+            {errors.experienceLevel && (
+              <p className="text-status-error mt-1 text-xs">
+                {errors.experienceLevel.message}
+              </p>
+            )}
+          </div>
         </div>
+
         <div className="flex gap-2">
           <Button type="submit" size="sm" isLoading={isSubmitting}>
             Save changes

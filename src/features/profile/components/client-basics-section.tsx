@@ -10,6 +10,7 @@ import { FaXTwitter } from "react-icons/fa6";
 import { EditableSection } from "@/features/profile/components/editable-section";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { AvatarUploadDialog } from "@/features/profile/components/avatar-upload-dialog";
@@ -21,6 +22,7 @@ import {
   type ClientBasicsInput,
   type ClientBasicsValues,
 } from "@/features/profile/schemas";
+import { companySizeLabels } from "@/types/enums";
 import type { AuthUser } from "@/types/user";
 import type { ClientProfile } from "@/types/profile";
 import { getInitials } from "@/lib/get-initials";
@@ -64,7 +66,10 @@ export function ClientBasicsSection({ user, profile }: Props) {
 
           <div className="text-text-secondary mt-4 flex flex-wrap gap-4 text-sm">
             {profile.companySize && (
-              <span>{profile.companySize} employees</span>
+              <span>
+                Company size:{" "}
+                {companySizeLabels[profile.companySize] ?? profile.companySize}
+              </span>
             )}
             {profile.foundedYear && <span>Founded {profile.foundedYear}</span>}
             {profile.location && (
@@ -127,6 +132,13 @@ function ClientBasicsForm({
   const updateBasics = useUpdateClientBasics();
   const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
 
+  // Older profiles may hold a free-text size like "11-50" from before the
+  // field became a fixed list. Show those as "not specified".
+  const sizeDefault =
+    profile.companySize && profile.companySize in companySizeLabels
+      ? profile.companySize
+      : "";
+
   const {
     register,
     handleSubmit,
@@ -137,11 +149,11 @@ function ClientBasicsForm({
     defaultValues: {
       companyName: profile.companyName ?? "",
       industry: profile.industry ?? "",
-      companySize: profile.companySize ?? "",
+      companySize: sizeDefault,
       website: profile.website ?? "",
       about: profile.about ?? "",
       location: profile.location ?? "",
-      foundedYear: profile.foundedYear,
+      foundedYear: profile.foundedYear ? String(profile.foundedYear) : "",
       linkedinUrl: profile.linkedinUrl ?? "",
       twitterUrl: profile.twitterUrl ?? "",
     },
@@ -221,11 +233,19 @@ function ClientBasicsForm({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <Label htmlFor="companySize">Company size</Label>
-            <Input
-              id="companySize"
-              placeholder="e.g. 11-50"
-              {...register("companySize")}
-            />
+            <Select id="companySize" {...register("companySize")}>
+              <option value="">Not specified</option>
+              {Object.entries(companySizeLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+            {errors.companySize && (
+              <p className="text-status-error mt-1 text-xs">
+                {errors.companySize.message}
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="foundedYear">Founded year</Label>

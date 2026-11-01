@@ -1,4 +1,4 @@
-import { AuthUser } from "./user";
+import type { Availability, CompanySize, ExperienceLevel } from "@/types/enums";
 
 export interface SkillRelation {
   id: string;
@@ -32,17 +32,25 @@ export interface PortfolioItem {
   imageUrl?: string;
 }
 
+export interface ProfileUser {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+}
+
 export interface FreelancerProfile {
   id: string;
   userId: string;
+  user: ProfileUser;
   title: string;
   bio: string;
   hourlyRate: number;
+  experienceLevel?: ExperienceLevel | null;
+  availability?: Availability | null;
   completionPercentage: number;
   skills: Skill[];
   experience: Experience[];
   portfolio: PortfolioItem[];
-  user: AuthUser[]
 }
 
 export interface ClientProfile {
@@ -50,12 +58,12 @@ export interface ClientProfile {
   userId: string;
   companyName?: string;
   industry?: string;
-  companySize?: string;
+  companySize?: CompanySize | null;
   website?: string;
   about?: string;
   location?: string;
   foundedYear?: number;
   linkedinUrl?: string;
   twitterUrl?: string;
-  user?:AuthUser[];
+  user?: ProfileUser;
 }
