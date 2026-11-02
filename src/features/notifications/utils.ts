@@ -1,41 +1,76 @@
+import type { NotificationType } from "@/types/enums";
 import type { AppNotification } from "@/types/notification";
 import type { UserRole } from "@/types/user";
 
-function extractId(link?: string | null): string | null {
-  if (!link) return null;
-  const match = link.match(
-    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
-  );
-  return match ? match[0] : null;
+function rolePrefix(role: UserRole): string {
+  return role === "CLIENT" ? "/client" : "/freelancer";
+}
+
+function sectionFor(type: NotificationType, role: UserRole): string {
+  const base = rolePrefix(role);
+
+  switch (type) {
+    case "NEW_APPLICATION":
+    case "APPLICATION_SHORTLISTED":
+    case "APPLICATION_REJECTED":
+      return `${base}/applications`;
+    case "FREELANCER_HIRED":
+    case "CONTRACT_ACTIVATED":
+    case "WORK_SUBMITTED":
+    case "CONTRACT_COMPLETED":
+      return `${base}/contracts`;
+    case "PAYMENT_SUCCESSFUL":
+      return role === "CLIENT" ? "/client/payments" : `${base}/contracts`;
+    case "NEW_REVIEW":
+      return `${base}/profile`;
+    default:
+      return `${base}/dashboard`;
+  }
 }
 
 export function getNotificationLink(
   notification: AppNotification,
   role: UserRole,
 ): string {
-  const base = role === "CLIENT" ? "/client" : "/freelancer";
-  const id = extractId(notification.link);
+  const base = rolePrefix(role);
+  const { type, entityType, entityId, meta } = notification;
+  const jobId = meta?.jobId;
+  const contractId = meta?.contractId;
 
-  switch (notification.type) {
-    case "NEW_APPLICATION":
-      return id ? `${base}/applications?jobId=${id}` : `${base}/applications`;
-    case "APPLICATION_SHORTLISTED":
-    case "APPLICATION_REJECTED":
-      return id ? `${base}/applications/${id}` : `${base}/applications`;
-    case "FREELANCER_HIRED":
-    case "CONTRACT_ACTIVATED":
-    case "WORK_SUBMITTED":
-    case "CONTRACT_COMPLETED":
-      return id ? `${base}/contracts/${id}` : `${base}/contracts`;
-    case "PAYMENT_SUCCESSFUL":
-      return id
-        ? `${base}/contracts/${id}`
-        : role === "CLIENT"
-          ? "/client/payments"
-          : `${base}/contracts`;
-    case "NEW_REVIEW":
+  switch (entityType) {
+    case "JOB":
+      return entityId ? `/jobs/${entityId}` : sectionFor(type, role);
+
+    case "APPLICATION":
+      if (entityId) return `${base}/applications/${entityId}`;
+      if (role === "CLIENT" && jobId) {
+        return `/client/applications?jobId=${jobId}`;
+      }
+      return `${base}/applications`;
+
+    case "CONTRACT":
+      return entityId ? `${base}/contracts/${entityId}` : `${base}/contracts`;
+
+    case "PAYMENT":
+      return contractId
+        ? `${base}/contracts/${contractId}`
+        : sectionFor(type, role);
+
+    case "REVIEW":
       return `${base}/profile`;
+
+    case "INVITATION":
+      return jobId ? `/jobs/${jobId}` : `${base}/dashboard`;
+
+    case "CONVERSATION":
+      // Built in C7.
+      return entityId ? `${base}/messages/${entityId}` : `${base}/messages`;
+
+    case "DISPUTE":
+      // Built in C14.
+      return entityId ? `${base}/disputes/${entityId}` : `${base}/disputes`;
+
     default:
-      return base;
+      return sectionFor(type, role);
   }
 }
