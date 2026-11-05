@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowUpRight, BriefcaseBusiness, UserRound } from "lucide-react";
+import { ArrowUpRight, BriefcaseBusiness, Star, UserRound } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { ProfileMetaBadges } from "@/features/profile/components/profile-meta-badges";
 import type { FreelancerListItem } from "@/services/profile";
 
 export function FeaturedTalentCard({
@@ -43,8 +44,36 @@ export function FeaturedTalentCard({
           <p className="text-text-secondary mt-1 line-clamp-2 text-sm leading-5">
             {freelancer.title || "Freelancer"}
           </p>
+
+          {/* An average of 0 with no reviews means "unrated", so skip the stars. */}
+          <div className="mt-2">
+            {freelancer.totalReviews > 0 ? (
+              <span className="inline-flex items-center gap-1 text-xs">
+                <Star className="fill-status-pending text-status-pending h-3.5 w-3.5" />
+                <span className="text-text-primary font-medium">
+                  {freelancer.averageRating.toFixed(1)}
+                </span>
+                <span className="text-text-secondary">
+                  ({freelancer.totalReviews})
+                </span>
+              </span>
+            ) : (
+              <span className="text-text-secondary text-xs">
+                No reviews yet
+              </span>
+            )}
+          </div>
         </div>
       </div>
+
+      {(freelancer.availability || freelancer.experienceLevel) && (
+        <div className="mt-4">
+          <ProfileMetaBadges
+            availability={freelancer.availability}
+            experienceLevel={freelancer.experienceLevel}
+          />
+        </div>
+      )}
 
       <p className="text-text-secondary mt-5 line-clamp-3 min-h-18 text-sm leading-6">
         {freelancer.bio?.trim() ||

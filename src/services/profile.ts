@@ -35,6 +35,20 @@ export interface FreelancerListItem {
   completionPercentage: number;
 }
 
+export interface FreelancerListParams {
+  search?: string;
+  // Skill names. The API matches freelancers who have ANY of them.
+  skills?: string[];
+  experienceLevel?: ExperienceLevel;
+  availability?: Availability;
+  minRate?: number;
+  maxRate?: number;
+  minRating?: number;
+  sortBy?: "newest" | "rate_asc" | "rate_desc" | "rating";
+  page?: number;
+  limit?: number;
+}
+
 function normalizeListItem(raw: any): FreelancerListItem {
   return {
     id: raw.id ?? raw.userId,
@@ -61,6 +75,28 @@ function normalizeListItem(raw: any): FreelancerListItem {
     totalReviews: raw.totalReviews ?? 0,
     completionPercentage: raw.completionPercentage ?? 0,
   };
+}
+
+function buildDirectoryQuery(params: FreelancerListParams) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null || value === "") continue;
+    if (Array.isArray(value)) {
+      if (value.length === 0) continue;
+      search.set(key, value.join(","));
+      continue;
+    }
+    search.set(key, String(value));
+  }
+  const qs = search.toString();
+  return qs ? `?${qs}` : "";
+}
+
+async function listFreelancers(params: FreelancerListParams = {}) {
+  const res = await apiClient.get<any[]>(
+    `/profiles/freelancer${buildDirectoryQuery(params)}`,
+  );
+  return { freelancers: res.data.map(normalizeListItem), meta: res.meta };
 }
 
 // The month picker gives "YYYY-MM", but the backend stores a real DateTime and
@@ -141,13 +177,11 @@ function toClientPayload(values: Partial<ClientBasicsValues>) {
 }
 
 export const freelancerProfileService = {
-  // Top-rated freelancers, paginated. Used by the homepage and directory hooks.
-  getFeaturedTalent: async (page = 1, limit = 6) => {
-    const res = await apiClient.get<any[]>(
-      `/profiles/freelancer?sortBy=rating&page=${page}&limit=${limit}`,
-    );
-    return { freelancers: res.data.map(normalizeListItem), meta: res.meta };
-  },
+  // The public directory: search, filters, sorting and pagination.
+  listFreelancers,
+  // Top-rated freelancers, paginated. Used by the homepage section.
+  getFeaturedTalent: (page = 1, limit = 6) =>
+    listFreelancers({ sortBy: "rating", page, limit }),
   getMe: async () => {
     const res = await apiClient.get<any>("/profiles/freelancer/me");
     return normalizeFreelancerProfile(res.data);
