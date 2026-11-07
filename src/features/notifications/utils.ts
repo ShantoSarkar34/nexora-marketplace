@@ -14,6 +14,10 @@ function sectionFor(type: NotificationType, role: UserRole): string {
     case "APPLICATION_SHORTLISTED":
     case "APPLICATION_REJECTED":
       return `${base}/applications`;
+    case "NEW_INVITATION":
+    case "INVITATION_ACCEPTED":
+    case "INVITATION_DECLINED":
+      return `${base}/invitations`;
     case "FREELANCER_HIRED":
     case "CONTRACT_ACTIVATED":
     case "WORK_SUBMITTED":
@@ -42,6 +46,8 @@ export function getNotificationLink(
       return entityId ? `/jobs/${entityId}` : sectionFor(type, role);
 
     case "APPLICATION":
+      // Both roles have an application detail page. For a client with no
+      // application id, fall back to that job's applicant list.
       if (entityId) return `${base}/applications/${entityId}`;
       if (role === "CLIENT" && jobId) {
         return `/client/applications?jobId=${jobId}`;
@@ -57,10 +63,14 @@ export function getNotificationLink(
         : sectionFor(type, role);
 
     case "REVIEW":
+      // The profile page lists the reviews you've received. The contract page
+      // only shows the review you wrote.
       return `${base}/profile`;
 
     case "INVITATION":
-      return jobId ? `/jobs/${jobId}` : `${base}/dashboard`;
+      // A new invitation reaches the freelancer's inbox; an accept or decline
+      // reaches the client's sent list.
+      return `${base}/invitations`;
 
     case "CONVERSATION":
       // Built in C7.

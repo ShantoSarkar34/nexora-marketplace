@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams, notFound } from "next/navigation";
+import {
+  notFound,
+  usePathname,
+  useParams,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import {
   Bookmark,
   Briefcase,
@@ -10,6 +16,8 @@ import {
   CheckCircle2,
   Clock,
   DollarSign,
+  PenSquare,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -41,6 +49,31 @@ function formatDeadline(iso: string) {
   });
 }
 
+// Accepting an invitation sends the freelancer here with ?apply=1. Open the
+// apply form once, then drop the param so a refresh doesn't reopen it.
+function AutoOpenApply({
+  enabled,
+  onOpen,
+}: {
+  enabled: boolean;
+  onOpen: () => void;
+}) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const handled = useRef(false);
+  const wantsApply = searchParams.get("apply") === "1";
+
+  useEffect(() => {
+    if (handled.current || !wantsApply || !enabled) return;
+    handled.current = true;
+    onOpen();
+    router.replace(pathname, { scroll: false });
+  }, [wantsApply, enabled, onOpen, router, pathname]);
+
+  return null;
+}
+
 export default function JobDetailsPage() {
   const params = useParams<{ id: string }>();
   const { user, isAuthenticated } = useAuth();
@@ -59,6 +92,7 @@ export default function JobDetailsPage() {
   if (isError || !job) notFound();
 
   const isFreelancer = isAuthenticated && user?.role === "FREELANCER";
+  const isOwner = isAuthenticated && user?.id === job.clientId;
   const isPending = saveJob.isPending || unsaveJob.isPending;
 
   async function toggleSave() {
@@ -225,6 +259,39 @@ export default function JobDetailsPage() {
             )}
           </Card>
 
+          {isOwner && (
+            <Card>
+              <h3>Manage this job</h3>
+              <div className="mt-4 space-y-2">
+                {(job.status === "DRAFT" || job.status === "OPEN") && (
+                  <Link href={`/client/jobs/${job.id}/edit`} className="block">
+                    <Button variant="secondary" className="w-full">
+                      <PenSquare className="mr-1.5 h-4 w-4" />
+                      Edit job
+                    </Button>
+                  </Link>
+                )}
+                <Link
+                  href={`/client/applications?jobId=${job.id}`}
+                  className="block"
+                >
+                  <Button variant="secondary" className="w-full">
+                    <Users className="mr-1.5 h-4 w-4" />
+                    View applications ({job.applicantCount})
+                  </Button>
+                </Link>
+                {job.status === "OPEN" && (
+                  <Link href={`/freelancers?jobId=${job.id}`} className="block">
+                    <Button className="w-full">
+                      <UserPlus className="mr-1.5 h-4 w-4" />
+                      Invite talent
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </Card>
+          )}
+
           {isFreelancer && job.status === "OPEN" && (
             <AIMatchCard jobId={job.id} />
           )}
@@ -238,6 +305,13 @@ export default function JobDetailsPage() {
           onOpenChange={setApplyOpen}
         />
       )}
+
+      <Suspense fallback={null}>
+        <AutoOpenApply
+          enabled={isFreelancer && job.status === "OPEN" && !job.hasApplied}
+          onOpen={() => setApplyOpen(true)}
+        />
+      </Suspense>
     </div>
   );
 }

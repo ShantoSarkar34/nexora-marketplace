@@ -20,6 +20,8 @@ export function useApplyToJob() {
       // Every job list and detail carries a hasApplied flag, so refresh them all.
       qc.invalidateQueries({ queryKey: ["jobs"] });
       qc.invalidateQueries({ queryKey: ["applications"] });
+      // Applying can settle a pending invitation for the same job.
+      qc.invalidateQueries({ queryKey: ["invitations"] });
     },
   });
 }
