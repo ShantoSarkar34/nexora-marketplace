@@ -8,6 +8,16 @@ export const metadata: Metadata = {
     "Search Nexora freelancers by skill, hourly rate, experience level, availability, and rating.",
 };
 
-export default function FindTalentPage() {
-  return <TalentDirectory />;
+export default async function FindTalentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ jobId?: string | string[] }>;
+}) {
+  const { jobId } = await searchParams;
+
+  return (
+    <TalentDirectory
+      inviteJobId={typeof jobId === "string" ? jobId : undefined}
+    />
+  );
 }

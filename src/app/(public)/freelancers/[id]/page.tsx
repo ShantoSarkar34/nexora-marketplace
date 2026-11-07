@@ -13,6 +13,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { InviteTalentCard } from "@/features/invitations/components/invite-talent-card";
 import { ProfileMetaBadges } from "@/features/profile/components/profile-meta-badges";
 import { RatingSummary } from "@/features/reviews/components/rating-summary";
 import { ReviewList } from "@/features/reviews/components/review-list";
@@ -313,6 +314,9 @@ export default function FreelancerPublicProfilePage() {
 
         {/* Sidebar */}
         <aside className="space-y-6">
+          {/* Renders nothing unless the viewer is a client. */}
+          <InviteTalentCard freelancerId={params.id} freelancerName={name} />
+
           <Card>
             <h2 className="text-text-primary text-base font-semibold">
               Profile Overview

@@ -2,13 +2,17 @@ import Link from "next/link";
 import { ArrowUpRight, BriefcaseBusiness, Star, UserRound } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { InviteToJobButton } from "@/features/invitations/components/invite-to-job-button";
 import { ProfileMetaBadges } from "@/features/profile/components/profile-meta-badges";
 import type { FreelancerListItem } from "@/services/profile";
 
 export function FeaturedTalentCard({
   freelancer,
+  inviteJobId,
 }: {
   freelancer: FreelancerListItem;
+  // The job a client arrived with from "Invite talent" on their job page.
+  inviteJobId?: string;
 }) {
   const skills = freelancer.skills
     .map((item) => item.skill.name)
@@ -116,6 +120,15 @@ export function FeaturedTalentCard({
           <ArrowUpRight className="h-4 w-4" />
         </Link>
       </div>
+
+      {/* Renders nothing unless the viewer is a client. */}
+      <InviteToJobButton
+        freelancerId={freelancer.userId}
+        freelancerName={freelancer.user.name}
+        defaultJobId={inviteJobId}
+        size="sm"
+        className="mt-3 w-full"
+      />
 
       <div className="text-text-secondary mt-3 flex items-center gap-1.5 text-xs">
         <BriefcaseBusiness className="h-3.5 w-3.5" />

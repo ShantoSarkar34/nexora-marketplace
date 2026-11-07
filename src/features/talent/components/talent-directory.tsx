@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Search, SearchX, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,8 +15,10 @@ import {
   defaultTalentFilters,
   type TalentFiltersState,
 } from "@/features/talent/components/talent-filters";
+import { useAuth } from "@/hooks/use-auth";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useFreelancerDirectory } from "@/hooks/use-freelancer-directory";
+import { useMyJobs } from "@/hooks/use-jobs";
 import { cn } from "@/lib/utils";
 import type { FreelancerListParams } from "@/services/profile";
 
@@ -51,7 +54,34 @@ function TalentCardSkeleton() {
   );
 }
 
-export function TalentDirectory() {
+// Shown to a client who arrived from "Invite talent" on one of their jobs.
+// Only mounted for clients, because it loads the client's own jobs.
+function InviteContextBanner({ jobId }: { jobId: string }) {
+  const { data } = useMyJobs({ limit: 50 });
+  const job = (data?.jobs ?? []).find(
+    (item) => item.id === jobId && item.status === "OPEN",
+  );
+
+  if (!job) return null;
+
+  return (
+    <div className="bg-brand-500/10 border-brand-500/30 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-md border px-4 py-3 text-sm">
+      <p className="text-text-primary">
+        Inviting talent to <strong>{job.title}</strong>. Use &quot;Invite to a
+        job&quot; on any card below.
+      </p>
+      <Link
+        href="/freelancers"
+        className="text-brand-600 font-medium hover:underline"
+      >
+        Clear
+      </Link>
+    </div>
+  );
+}
+
+export function TalentDirectory({ inviteJobId }: { inviteJobId?: string }) {
+  const { user } = useAuth();
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput, 400);
   const [filters, setFilters] =
@@ -123,6 +153,10 @@ export function TalentDirectory() {
             : `${total} freelancer${total === 1 ? "" : "s"} found`}
         </p>
       </div>
+
+      {inviteJobId && user?.role === "CLIENT" && (
+        <InviteContextBanner jobId={inviteJobId} />
+      )}
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
@@ -226,6 +260,7 @@ export function TalentDirectory() {
                   <FeaturedTalentCard
                     key={freelancer.id}
                     freelancer={freelancer}
+                    inviteJobId={inviteJobId}
                   />
                 ))}
               </div>
