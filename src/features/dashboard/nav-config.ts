@@ -13,6 +13,7 @@ import {
   FileSignature,
   CreditCard,
   Mail,
+  MessageSquare,
   Send,
   type LucideIcon,
 } from "lucide-react";
@@ -34,6 +35,7 @@ export const freelancerNavItems: NavItem[] = [
     icon: FileText,
   },
   { label: "Invitations", href: "/freelancer/invitations", icon: Mail },
+  { label: "Messages", href: "/freelancer/messages", icon: MessageSquare },
   { label: "My Contracts", href: "/freelancer/contracts", icon: Briefcase },
   { label: "Notifications", href: "/freelancer/notifications", icon: Bell },
   { label: "Settings", href: "/freelancer/settings", icon: Settings },
@@ -46,6 +48,7 @@ export const clientNavItems: NavItem[] = [
   { label: "My Jobs", href: "/client/jobs", icon: Briefcase },
   { label: "Applications", href: "/client/applications", icon: Users },
   { label: "Invitations", href: "/client/invitations", icon: Send },
+  { label: "Messages", href: "/client/messages", icon: MessageSquare },
   { label: "Contracts", href: "/client/contracts", icon: FileSignature },
   { label: "Payments", href: "/client/payments", icon: CreditCard },
   { label: "Notifications", href: "/client/notifications", icon: Bell },
