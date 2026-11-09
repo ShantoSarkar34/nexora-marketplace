@@ -7,6 +7,7 @@ import { FaLinkedin } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { ProfileMessageButton } from "@/features/messaging/components/profile-message-button";
 import { RatingSummary } from "@/features/reviews/components/rating-summary";
 import { ReviewList } from "@/features/reviews/components/review-list";
 import { clientProfileService } from "@/services/profile";
@@ -121,8 +122,13 @@ export default function ClientPublicProfilePage() {
             )}
           </div>
         )}
+
+        {/* Only appears once you already have a conversation with them. */}
+        <ProfileMessageButton userId={params.id} className="mt-4" />
       </Card>
 
+      {/* Reviews sit right after the header: for someone deciding whether to
+          apply, a client's reputation matters most. */}
       <Card className="mt-6">
         <h3>Reviews</h3>
         <div className="mt-4">
