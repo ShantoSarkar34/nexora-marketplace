@@ -1,23 +1,25 @@
 "use client";
 
-import { useParams, notFound } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
+import { notFound, useParams } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
+import { Avatar } from "@/components/shared/avatar";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Alert } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
-import { ContractStatusBadge } from "@/features/contracts/status-badge";
-import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
+import { Textarea } from "@/components/ui/textarea";
 import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
-import { useContract, useSubmitWork } from "@/hooks/use-contracts";
+import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
+import { ContractStatusBadge } from "@/features/contracts/status-badge";
+import { MessageButton } from "@/features/messaging/components/message-button";
 import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
-import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { useContract, useSubmitWork } from "@/hooks/use-contracts";
 
 export default function FreelancerContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -56,16 +58,31 @@ export default function FreelancerContractDetailsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1>{contract.jobTitle}</h1>
-          <p className="text-text-secondary mt-1">{contract.freelancerName}</p>
-          <Link
-            href={`/freelancers/${contract.freelancerId}`}
-            target="_blank"
-            className="text-brand-600 mt-1 flex items-center gap-1 text-xs font-medium"
-          >
-            View freelancer profile <ExternalLink className="h-3 w-3" />
-          </Link>
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar
+            name={contract.clientName}
+            imageUrl={contract.clientImageUrl}
+            size="lg"
+            accent="client"
+          />
+          <div className="min-w-0">
+            <h1>{contract.jobTitle}</h1>
+            <p className="text-text-secondary mt-1">{contract.clientName}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <Link
+                href={`/clients/${contract.clientId}`}
+                target="_blank"
+                className="text-brand-600 flex items-center gap-1 text-xs font-medium"
+              >
+                View client profile <ExternalLink className="h-3 w-3" />
+              </Link>
+              <MessageButton
+                jobId={contract.jobId}
+                otherUserId={contract.clientId}
+                size="sm"
+              />
+            </div>
+          </div>
         </div>
         <ContractStatusBadge status={contract.status} />
       </div>

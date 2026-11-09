@@ -1,13 +1,16 @@
 "use client";
 
-import { useParams, notFound } from "next/navigation";
+import Link from "next/link";
+import { notFound, useParams } from "next/navigation";
 import { toast } from "sonner";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/shared/avatar";
 import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { ApplicationStatusBadge } from "@/features/applications/status-badge";
+import { MessageButton } from "@/features/messaging/components/message-button";
 import {
   useApplication,
   useWithdrawApplication,
@@ -29,6 +32,7 @@ export default function ApplicationDetailsPage() {
 
   const canWithdraw =
     application.status === "PENDING" || application.status === "SHORTLISTED";
+  const clientName = application.clientName || "Client";
 
   async function handleWithdraw() {
     try {
@@ -42,9 +46,35 @@ export default function ApplicationDetailsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1>{application.jobTitle}</h1>
-          <p className="text-text-secondary mt-1">{application.clientName}</p>
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar
+            name={clientName}
+            imageUrl={application.clientImageUrl}
+            size="lg"
+            accent="client"
+          />
+          <div className="min-w-0">
+            <h1>{application.jobTitle}</h1>
+            <div className="mt-1 flex flex-wrap items-center gap-3">
+              {application.clientId ? (
+                <Link
+                  href={`/clients/${application.clientId}`}
+                  className="text-text-secondary hover:text-brand-600 text-sm hover:underline"
+                >
+                  {clientName}
+                </Link>
+              ) : (
+                <span className="text-text-secondary text-sm">
+                  {clientName}
+                </span>
+              )}
+              <MessageButton
+                jobId={application.jobId}
+                otherUserId={application.clientId}
+                size="sm"
+              />
+            </div>
+          </div>
         </div>
         <ApplicationStatusBadge status={application.status} />
       </div>

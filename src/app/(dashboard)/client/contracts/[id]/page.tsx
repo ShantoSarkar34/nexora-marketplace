@@ -1,25 +1,27 @@
 "use client";
 
-import { useParams, notFound } from "next/navigation";
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import { notFound, useParams } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/shared/avatar";
 import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { ContractStatusBadge } from "@/features/contracts/status-badge";
-import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
 import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
+import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
+import { ContractStatusBadge } from "@/features/contracts/status-badge";
+import { MessageButton } from "@/features/messaging/components/message-button";
+import { PayNowButton } from "@/features/payments/components/pay-now-button";
+import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
 import {
   useApproveWork,
   useContract,
   useRequestRevision,
 } from "@/hooks/use-contracts";
-import { PayNowButton } from "@/features/payments/components/pay-now-button";
-import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
-import { ExternalLink } from "lucide-react";
 
 export default function ClientContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -58,16 +60,33 @@ export default function ClientContractDetailsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1>{contract.jobTitle}</h1>
-          <p className="text-text-secondary mt-1">{contract.clientName}</p>
-          <Link
-            href={`/clients/${contract.clientId}`}
-            target="_blank"
-            className="text-brand-600 mt-1 flex items-center gap-1 text-xs font-medium"
-          >
-            View client profile <ExternalLink className="h-3 w-3" />
-          </Link>
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar
+            name={contract.freelancerName}
+            imageUrl={contract.freelancerImageUrl}
+            size="lg"
+            accent="freelancer"
+          />
+          <div className="min-w-0">
+            <h1>{contract.jobTitle}</h1>
+            <p className="text-text-secondary mt-1">
+              {contract.freelancerName}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <Link
+                href={`/freelancers/${contract.freelancerId}`}
+                target="_blank"
+                className="text-brand-600 flex items-center gap-1 text-xs font-medium"
+              >
+                View freelancer profile <ExternalLink className="h-3 w-3" />
+              </Link>
+              <MessageButton
+                jobId={contract.jobId}
+                otherUserId={contract.freelancerId}
+                size="sm"
+              />
+            </div>
+          </div>
         </div>
         <ContractStatusBadge status={contract.status} />
       </div>
@@ -78,14 +97,13 @@ export default function ClientContractDetailsPage() {
 
       {contract.status === "PENDING" && (
         <Alert variant="info">
-          This contract is pending payment. Complete payment to activate it and
-          let {contract.freelancerName} begin work.{" "}
-          <Link
-            href={`/client/payments?contractId=${contract.id}`}
-            className="font-medium underline"
-          >
-            Go to Payments
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>
+              This contract is pending payment. Complete payment to activate it
+              and let {contract.freelancerName} begin work.
+            </span>
+            <PayNowButton contractId={contract.id} />
+          </div>
         </Alert>
       )}
 
@@ -107,7 +125,7 @@ export default function ClientContractDetailsPage() {
               View submitted work →
             </a>
           )}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button onClick={handleApprove} isLoading={approveWork.isPending}>
               Approve Work
             </Button>
@@ -129,16 +147,10 @@ export default function ClientContractDetailsPage() {
         />
       )}
 
-      {contract.status === "PENDING" && (
-        <Alert variant="info">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span>
-              This contract is pending payment. Complete payment to activate it
-              and let {contract.freelancerName} begin work.
-            </span>
-            <PayNowButton contractId={contract.id} />
-          </div>
-        </Alert>
+      {(contract.status === "PENDING" || contract.status === "ACTIVE") && (
+        <Button variant="destructive" onClick={() => setCancelOpen(true)}>
+          Cancel Contract
+        </Button>
       )}
 
       <CancelContractDialog

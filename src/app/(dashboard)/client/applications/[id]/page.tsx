@@ -1,21 +1,21 @@
 "use client";
 
-import { useParams, notFound } from "next/navigation";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { notFound, useParams, useRouter } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/shared/avatar";
 import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { ApplicationStatusBadge } from "@/features/applications/status-badge";
-import { Avatar } from "@/components/shared/avatar";
+import { MessageButton } from "@/features/messaging/components/message-button";
 import {
   useApplication,
   useUpdateApplicationStatus,
 } from "@/hooks/use-applications";
-import Link from "next/link";
-import { ExternalLink } from "lucide-react";
 import { useHireFreelancer } from "@/hooks/use-contracts";
 
 export default function ApplicantDetailsPage() {
@@ -87,13 +87,20 @@ export default function ApplicantDetailsPage() {
                 {application.freelancerTitle}
               </p>
             )}
-            <Link
-              href={`/freelancers/${application.freelancerId}`}
-              target="_blank"
-              className="text-brand-600 mt-1 flex items-center gap-1 text-xs font-medium"
-            >
-              View full profile <ExternalLink className="h-3 w-3" />
-            </Link>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <Link
+                href={`/freelancers/${application.freelancerId}`}
+                target="_blank"
+                className="text-brand-600 flex items-center gap-1 text-xs font-medium"
+              >
+                View full profile <ExternalLink className="h-3 w-3" />
+              </Link>
+              <MessageButton
+                jobId={application.jobId}
+                otherUserId={application.freelancerId}
+                size="sm"
+              />
+            </div>
           </div>
         </div>
         <ApplicationStatusBadge status={application.status} />
