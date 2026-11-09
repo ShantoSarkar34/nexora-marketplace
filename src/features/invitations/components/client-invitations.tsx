@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { InvitationStatusBadge } from "@/features/invitations/components/invitation-status-badge";
 import { formatInvitationBudget } from "@/features/invitations/utils";
 import { timeAgo } from "@/features/jobs/utils";
+import { MessageButton } from "@/features/messaging/components/message-button";
 import {
   useCancelInvitation,
   useSentInvitations,
@@ -179,7 +180,7 @@ export function ClientInvitations() {
                   )}
 
                   {invitation.status === "PENDING" && (
-                    <div className="mt-4">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         variant="secondary"
@@ -189,11 +190,18 @@ export function ClientInvitations() {
                       >
                         Cancel invitation
                       </Button>
+                      {freelancer?.id && (
+                        <MessageButton
+                          jobId={invitation.jobId}
+                          otherUserId={freelancer.id}
+                          size="sm"
+                        />
+                      )}
                     </div>
                   )}
 
                   {invitation.status === "ACCEPTED" && (
-                    <div className="mt-4">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Link
                         href={`/client/applications?jobId=${invitation.jobId}`}
                       >
@@ -201,6 +209,13 @@ export function ClientInvitations() {
                           View applicants
                         </Button>
                       </Link>
+                      {freelancer?.id && (
+                        <MessageButton
+                          jobId={invitation.jobId}
+                          otherUserId={freelancer.id}
+                          size="sm"
+                        />
+                      )}
                     </div>
                   )}
 

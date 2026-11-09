@@ -47,9 +47,13 @@ function usePollingErrorGuard(error: unknown) {
   }, [error, router, qc]);
 }
 
+// `poll: false` is for pages that only need to look something up, such as a
+// profile page checking whether a conversation already exists.
 export function useConversations(
   params: { page?: number; limit?: number } = {},
+  options: { poll?: boolean } = {},
 ) {
+  const { poll = true } = options;
   const { user } = useAuth();
 
   const query = useQuery({
@@ -57,9 +61,9 @@ export function useConversations(
     queryFn: () => messagingService.listConversations(params),
     enabled: !!user,
     placeholderData: keepPreviousData,
-    refetchInterval: INBOX_POLL_MS,
+    refetchInterval: poll ? INBOX_POLL_MS : false,
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: poll,
     retry: false,
     meta: { silent: true },
   });
@@ -68,7 +72,37 @@ export function useConversations(
   return query;
 }
 
-// Used by the sidebar badge in C8.
+// The most recent conversation with one person, if any. It reads the same
+// inbox list the Messages page uses, so it adds no request of its own when
+// that list is already cached.
+export function useConversationWith(otherUserId: string) {
+  const query = useConversations({ limit: 50 }, { poll: false });
+  const conversation = otherUserId
+    ? (query.data?.conversations.find(
+        (item) => item.otherUser.id === otherUserId,
+      ) ?? null)
+    : null;
+
+  return { conversation, isLoading: query.isLoading };
+}
+
+// Get-or-create a conversation about a job. Returns the existing one when
+// there already is one.
+export function useOpenConversation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: { jobId: string; otherUserId: string }) =>
+      messagingService.openConversation(payload),
+    meta: {
+      forbiddenMessage:
+        "You can message this person once they've applied to the job, been invited to it, or have a contract with you on it.",
+    },
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: messagingKeys.conversations }),
+  });
+}
+
 export function useMessagesUnreadCount(enabled = true) {
   const { user } = useAuth();
 
@@ -172,12 +206,10 @@ export function useSendMessage(conversationId: string) {
         "You're sending messages too quickly. Please wait a moment and try again.",
     },
     onSuccess: (message) => {
-      qc.setQueryData<ThreadData>(
-        messagingKeys.thread(conversationId),
-        (old) =>
-          old
-            ? { ...old, messages: mergeMessages(old.messages, [message]) }
-            : old,
+      qc.setQueryData<ThreadData>(messagingKeys.thread(conversationId), (old) =>
+        old
+          ? { ...old, messages: mergeMessages(old.messages, [message]) }
+          : old,
       );
       qc.invalidateQueries({ queryKey: messagingKeys.conversations });
     },
@@ -202,15 +234,13 @@ export function useLoadOlderMessages(conversationId: string) {
     },
     onSuccess: (page) => {
       if (!page) return;
-      qc.setQueryData<ThreadData>(
-        messagingKeys.thread(conversationId),
-        (old) =>
-          old
-            ? {
-                messages: mergeMessages(old.messages, page.messages),
-                hasMore: page.hasMore,
-              }
-            : old,
+      qc.setQueryData<ThreadData>(messagingKeys.thread(conversationId), (old) =>
+        old
+          ? {
+              messages: mergeMessages(old.messages, page.messages),
+              hasMore: page.hasMore,
+            }
+          : old,
       );
     },
   });
@@ -228,19 +258,17 @@ export function useMarkConversationRead(conversationId: string) {
       const now = new Date().toISOString();
 
       // Reflect it locally so reopening the thread doesn't mark it read again.
-      qc.setQueryData<ThreadData>(
-        messagingKeys.thread(conversationId),
-        (old) =>
-          old
-            ? {
-                ...old,
-                messages: old.messages.map((message) =>
-                  message.senderId !== me?.id && !message.readAt
-                    ? { ...message, readAt: now }
-                    : message,
-                ),
-              }
-            : old,
+      qc.setQueryData<ThreadData>(messagingKeys.thread(conversationId), (old) =>
+        old
+          ? {
+              ...old,
+              messages: old.messages.map((message) =>
+                message.senderId !== me?.id && !message.readAt
+                  ? { ...message, readAt: now }
+                  : message,
+              ),
+            }
+          : old,
       );
       qc.invalidateQueries({ queryKey: messagingKeys.conversations });
       qc.invalidateQueries({ queryKey: messagingKeys.unreadCount });

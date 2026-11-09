@@ -4,7 +4,10 @@ import { ApiError, isSuspendedError } from "@/lib/api-client";
 
 interface HandleApiErrorOptions {
   source?: "query" | "mutation";
+  /** Friendly per-action text for 429s, set through the mutation's `meta`. */
   rateLimitMessage?: string;
+  /** Friendly per-action text for 403s, set through the mutation's `meta`. */
+  forbiddenMessage?: string;
   onUnauthorized?: () => void;
   onSuspended?: () => void;
 }
@@ -18,6 +21,7 @@ export function handleApiError(
     return;
   }
 
+  // Suspension needs its own screen, so it wins over the generic 403 rule.
   if (isSuspendedError(error)) {
     options.onSuspended?.();
     return;
@@ -25,13 +29,17 @@ export function handleApiError(
 
   switch (error.status) {
     case 401:
+      // A failed mutation (wrong password, deleted account...) deserves its
+      // message. A failed query just means the session ended.
       if (options.source === "mutation") {
         toast.error(error.message || "Please log in to continue.");
       }
       options.onUnauthorized?.();
       break;
     case 403:
-      toast.error("You don't have permission to do that.");
+      toast.error(
+        options.forbiddenMessage ?? "You don't have permission to do that.",
+      );
       break;
     case 404:
       toast.error("We couldn't find what you were looking for.");
@@ -43,8 +51,7 @@ export function handleApiError(
     case 429:
       toast.warning(
         options.rateLimitMessage ??
-          (error.message ||
-            "You're doing that too often. Please wait a moment."),
+          (error.message || "You're doing that too often. Please wait a moment."),
       );
       break;
     case 502:

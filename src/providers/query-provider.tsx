@@ -13,12 +13,7 @@ import { authQueryKey } from "@/hooks/use-auth";
 import { ApiError } from "@/lib/api-client";
 import { handleApiError } from "@/lib/handle-api-error";
 
-const AUTH_PATHS = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-];
+const AUTH_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 export function QueryProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -54,10 +49,14 @@ export function QueryProvider({ children }: { children: ReactNode }) {
       mutationCache: new MutationCache({
         onError: (error, _variables, _context, mutation) => {
           if (mutation.meta?.silent) return;
-          const custom = mutation.meta?.rateLimitMessage;
+          const rateLimit = mutation.meta?.rateLimitMessage;
+          const forbidden = mutation.meta?.forbiddenMessage;
           handleApiError(error, {
             source: "mutation",
-            rateLimitMessage: typeof custom === "string" ? custom : undefined,
+            rateLimitMessage:
+              typeof rateLimit === "string" ? rateLimit : undefined,
+            forbiddenMessage:
+              typeof forbidden === "string" ? forbidden : undefined,
             onUnauthorized: () => {
               void client.invalidateQueries({ queryKey: authQueryKey });
             },
@@ -70,6 +69,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
           staleTime: 60 * 1000,
           refetchOnWindowFocus: false,
           retry: (failureCount, error) => {
+            // 4xx errors won't fix themselves; retry once for network/5xx.
             if (
               error instanceof ApiError &&
               error.status >= 400 &&

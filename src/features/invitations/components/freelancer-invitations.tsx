@@ -16,6 +16,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { InvitationStatusBadge } from "@/features/invitations/components/invitation-status-badge";
 import { formatInvitationBudget } from "@/features/invitations/utils";
 import { timeAgo } from "@/features/jobs/utils";
+import { MessageButton } from "@/features/messaging/components/message-button";
 import {
   useMyInvitations,
   useRespondToInvitation,
@@ -50,9 +51,7 @@ export function FreelancerInvitations() {
         status: next,
       });
       if (next === "ACCEPTED") {
-        toast.success(
-          "Invitation accepted. Send your proposal to complete it.",
-        );
+        toast.success("Invitation accepted. Send your proposal to complete it.");
         // Accepting doesn't create an application, so open the apply form.
         router.push(`/jobs/${result.jobId || invitation.jobId}?apply=1`);
       } else {
@@ -149,10 +148,7 @@ export function FreelancerInvitations() {
                     <InvitationStatusBadge status={invitation.status} />
                   </div>
 
-                  <Link
-                    href={`/jobs/${invitation.jobId}`}
-                    className="mt-4 block"
-                  >
+                  <Link href={`/jobs/${invitation.jobId}`} className="mt-4 block">
                     <h3 className="text-text-primary hover:text-brand-600 text-base font-semibold">
                       {invitation.job.title}
                     </h3>
@@ -168,7 +164,7 @@ export function FreelancerInvitations() {
                   )}
 
                   {invitation.status === "PENDING" && (
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         onClick={() => handleRespond(invitation, "ACCEPTED")}
@@ -190,16 +186,30 @@ export function FreelancerInvitations() {
                       >
                         Decline
                       </Button>
+                      {client?.id && (
+                        <MessageButton
+                          jobId={invitation.jobId}
+                          otherUserId={client.id}
+                          size="sm"
+                        />
+                      )}
                     </div>
                   )}
 
                   {invitation.status === "ACCEPTED" && (
-                    <div className="mt-4">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Link href={`/jobs/${invitation.jobId}`}>
                         <Button size="sm" variant="secondary">
                           View job
                         </Button>
                       </Link>
+                      {client?.id && (
+                        <MessageButton
+                          jobId={invitation.jobId}
+                          otherUserId={client.id}
+                          size="sm"
+                        />
+                      )}
                     </div>
                   )}
 
