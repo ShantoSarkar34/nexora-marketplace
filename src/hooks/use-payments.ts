@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 
 import { paymentsService } from "@/services/payments";
 import type { PaymentStatus } from "@/types/enums";
@@ -39,5 +39,33 @@ export function useMyPayments(
         ...rest,
         status: status && status !== "ALL" ? status : undefined,
       }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+// Freelancer-only.
+export function useEarnings() {
+  return useQuery({
+    queryKey: ["payments", "earnings"],
+    queryFn: paymentsService.earnings,
+  });
+}
+
+// Freelancer-only.
+export function useEarningsTransactions(
+  params: { page?: number; limit?: number } = {},
+) {
+  return useQuery({
+    queryKey: ["payments", "earnings", "transactions", params],
+    queryFn: () => paymentsService.earningsTransactions(params),
+    placeholderData: keepPreviousData,
+  });
+}
+
+// Client-only.
+export function useSpending() {
+  return useQuery({
+    queryKey: ["payments", "spending"],
+    queryFn: paymentsService.spending,
   });
 }
