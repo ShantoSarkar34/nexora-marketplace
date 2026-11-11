@@ -15,6 +15,7 @@ import {
   Mail,
   MessageSquare,
   Send,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -44,6 +45,7 @@ export const freelancerNavItems: NavItem[] = [
     badge: "messages",
   },
   { label: "My Contracts", href: "/freelancer/contracts", icon: Briefcase },
+  { label: "Earnings", href: "/freelancer/earnings", icon: Wallet },
   { label: "Notifications", href: "/freelancer/notifications", icon: Bell },
   { label: "Settings", href: "/freelancer/settings", icon: Settings },
 ];
