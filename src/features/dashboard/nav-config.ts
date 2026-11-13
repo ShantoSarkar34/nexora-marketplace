@@ -15,6 +15,7 @@ import {
   Mail,
   MessageSquare,
   Send,
+  Sparkles,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -31,6 +32,7 @@ export const freelancerNavItems: NavItem[] = [
   { label: "Overview", href: "/freelancer/dashboard", icon: LayoutDashboard },
   { label: "My Profile", href: "/freelancer/profile", icon: User },
   { label: "Browse Jobs", href: "/freelancer/jobs", icon: Search },
+  { label: "Matched Jobs", href: "/freelancer/recommended", icon: Sparkles },
   { label: "Saved Jobs", href: "/freelancer/saved-jobs", icon: Bookmark },
   {
     label: "My Applications",

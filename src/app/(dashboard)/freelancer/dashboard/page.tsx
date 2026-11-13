@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { ApplicationStatusBadge } from "@/features/applications/status-badge";
 import { countOf, pluralize } from "@/features/dashboard/utils";
 import { formatMoney } from "@/features/payments/utils";
+import { RecommendedJobsPreview } from "@/features/recommendations/components/recommended-jobs-preview";
 import { useMyApplications } from "@/hooks/use-applications";
 import { useAuth } from "@/hooks/use-auth";
 import { useFreelancerDashboardStats } from "@/hooks/use-dashboard";
@@ -141,6 +142,10 @@ export default function FreelancerDashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <ActionNeededCard items={actionItems} isLoading={stats.isLoading} />
+
+          {/* Without a profile there is nothing to match yet, and the
+              "Set up your profile" card on the right already covers it. */}
+          {data?.profile.hasProfile && <RecommendedJobsPreview />}
 
           <Card>
             <div className="flex items-center justify-between gap-3">
