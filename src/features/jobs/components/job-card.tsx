@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JobPoster } from "@/features/jobs/components/job-poster";
+import { MatchBadge } from "@/features/jobs/components/match-badge";
 import { cn } from "@/lib/utils";
 import { experienceLevelLabels } from "@/types/enums";
 import {
@@ -18,9 +19,14 @@ import {
 } from "@/features/jobs/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useSaveJob, useUnsaveJob } from "@/hooks/use-jobs";
-import type { Job } from "@/types/job";
+import type { Job, JobMatch } from "@/types/job";
 
-export function JobCard({ job }: { job: Job }) {
+interface JobCardProps {
+  job: Job;
+  match?: JobMatch;
+}
+
+export function JobCard({ job, match }: JobCardProps) {
   const { isAuthenticated, user } = useAuth();
   const saveJob = useSaveJob();
   const unsaveJob = useUnsaveJob();
@@ -28,6 +34,19 @@ export function JobCard({ job }: { job: Job }) {
   const canSave = isAuthenticated && user?.role === "FREELANCER";
   const isPending = saveJob.isPending || unsaveJob.isPending;
   const skillNames = getJobSkillNames(job);
+
+  const matchedNames = new Set(
+    (match?.matchedSkills ?? []).map((name) => name.toLowerCase()),
+  );
+  const isMatched = (name: string) => matchedNames.has(name.toLowerCase());
+
+  // Matched skills first, otherwise the original order.
+  const orderedSkills = match
+    ? [...skillNames].sort(
+        (a, b) => Number(isMatched(b)) - Number(isMatched(a)),
+      )
+    : skillNames;
+  const matchedCount = skillNames.filter(isMatched).length;
 
   async function toggleSave(e: React.MouseEvent) {
     e.preventDefault();
@@ -67,19 +86,22 @@ export function JobCard({ job }: { job: Job }) {
               </span>
             </div>
           </div>
-          <button
-            onClick={toggleSave}
-            disabled={isPending}
-            aria-label={job.isSaved ? "Unsave job" : "Save job"}
-            className="text-text-secondary hover:text-brand-600 shrink-0 disabled:opacity-50"
-          >
-            <Bookmark
-              className={cn(
-                "h-5 w-5",
-                job.isSaved && "fill-brand-600 text-brand-600",
-              )}
-            />
-          </button>
+          <div className="flex shrink-0 items-center gap-3">
+            {match && <MatchBadge score={match.score} />}
+            <button
+              onClick={toggleSave}
+              disabled={isPending}
+              aria-label={job.isSaved ? "Unsave job" : "Save job"}
+              className="text-text-secondary hover:text-brand-600 disabled:opacity-50"
+            >
+              <Bookmark
+                className={cn(
+                  "h-5 w-5",
+                  job.isSaved && "fill-brand-600 text-brand-600",
+                )}
+              />
+            </button>
+          </div>
         </div>
 
         <p className="text-text-secondary mt-3 line-clamp-2 text-sm">
@@ -87,12 +109,21 @@ export function JobCard({ job }: { job: Job }) {
         </p>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {skillNames.slice(0, 4).map((name) => (
-            <Badge key={name} variant="neutral">
+          {orderedSkills.slice(0, 4).map((name) => (
+            <Badge
+              key={name}
+              variant={match && isMatched(name) ? "success" : "neutral"}
+            >
               {name}
             </Badge>
           ))}
         </div>
+
+        {match && skillNames.length > 0 && (
+          <p className="text-text-secondary mt-2 text-xs">
+            {matchedCount} of {skillNames.length} required skills match
+          </p>
+        )}
 
         <div className="border-border text-text-secondary mt-4 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-xs">
           <div className="flex items-center gap-4">
