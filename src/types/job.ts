@@ -60,3 +60,24 @@ export interface JobListParams {
   page?: number;
   limit?: number;
 }
+
+// GET /jobs/recommended
+
+// Why the feed is empty, when it is.
+export type RecommendedReason = "NO_PROFILE" | "NO_SKILLS" | "NO_MATCHES";
+
+export interface JobMatch {
+  // 0–100
+  score: number;
+  matchedSkills: string[];
+}
+
+export interface RecommendedJob {
+  job: Job;
+  match: JobMatch;
+}
+
+export interface RecommendedFeed {
+  items: RecommendedJob[];
+  reason?: RecommendedReason;
+}

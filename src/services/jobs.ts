@@ -1,5 +1,11 @@
 import { apiClient } from "@/lib/api-client";
-import type { Job, JobListParams } from "@/types/job";
+import type {
+  Job,
+  JobListParams,
+  RecommendedFeed,
+  RecommendedJob,
+  RecommendedReason,
+} from "@/types/job";
 import type { JobStatus } from "@/types/enums";
 
 function buildQuery(params: object) {
@@ -13,8 +19,30 @@ function buildQuery(params: object) {
   return qs ? `?${qs}` : "";
 }
 
+// GET /jobs/saved/me now returns flat jobs (same shape as the job list) plus
+// `savedAt`. Everything on that page is saved by definition. The
+// `raw.job ?? raw` keeps working if an old join-row shape ever shows up.
 function normalizeSavedJob(raw: any): Job {
   return { ...(raw.job ?? raw), isSaved: true };
+}
+
+const RECOMMENDED_REASONS: string[] = ["NO_PROFILE", "NO_SKILLS", "NO_MATCHES"];
+
+function isRecommendedReason(value: unknown): value is RecommendedReason {
+  return typeof value === "string" && RECOMMENDED_REASONS.includes(value);
+}
+
+// Each item is { job, matchScore (0-100), matchedSkills[] }.
+function normalizeRecommended(raw: any): RecommendedJob {
+  const score = typeof raw.matchScore === "number" ? raw.matchScore : 0;
+
+  return {
+    job: raw.job,
+    match: {
+      score: Math.max(0, Math.min(100, Math.round(score))),
+      matchedSkills: Array.isArray(raw.matchedSkills) ? raw.matchedSkills : [],
+    },
+  };
 }
 
 interface JobPayload {
@@ -33,6 +61,24 @@ export const jobsService = {
   list: async (params: JobListParams) => {
     const res = await apiClient.get<Job[]>(`/jobs${buildQuery(params)}`);
     return { jobs: res.data, meta: res.meta };
+  },
+  // Freelancer-only. The API accepts a limit of 1–30.
+  recommended: async (limit = 10): Promise<RecommendedFeed> => {
+    const safeLimit = Math.min(30, Math.max(1, limit));
+    const res = await apiClient.get<any[]>(
+      `/jobs/recommended${buildQuery({ limit: safeLimit })}`,
+    );
+
+    // This endpoint's meta is { limit, reason? } instead of page numbers.
+    const reason = (res.meta as unknown as { reason?: string } | undefined)
+      ?.reason;
+
+    return {
+      items: (res.data ?? [])
+        .map(normalizeRecommended)
+        .filter((item) => !!item.job),
+      reason: isRecommendedReason(reason) ? reason : undefined,
+    };
   },
   getById: async (jobId: string) => {
     const res = await apiClient.get<Job>(`/jobs/${jobId}`);
@@ -54,15 +100,11 @@ export const jobsService = {
     await apiClient.delete<void>(`/jobs/${jobId}`);
   },
   myJobs: async (params: { page?: number; limit?: number } = {}) => {
-    const res = await apiClient.get<Job[]>(
-      `/jobs/client/me${buildQuery(params)}`,
-    );
+    const res = await apiClient.get<Job[]>(`/jobs/client/me${buildQuery(params)}`);
     return { jobs: res.data, meta: res.meta };
   },
   savedJobs: async (params: { page?: number; limit?: number } = {}) => {
-    const res = await apiClient.get<any[]>(
-      `/jobs/saved/me${buildQuery(params)}`,
-    );
+    const res = await apiClient.get<any[]>(`/jobs/saved/me${buildQuery(params)}`);
     return { jobs: res.data.map(normalizeSavedJob), meta: res.meta };
   },
   save: async (jobId: string) => {
