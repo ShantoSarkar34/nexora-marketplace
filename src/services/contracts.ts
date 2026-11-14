@@ -1,5 +1,17 @@
 import { apiClient } from "@/lib/api-client";
 import type { Contract } from "@/types/contract";
+import type { ContractStatus } from "@/types/enums";
+
+function buildQuery(params: object) {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== "") {
+      search.set(key, String(value));
+    }
+  }
+  const qs = search.toString();
+  return qs ? `?${qs}` : "";
+}
 
 function normalizeContract(raw: any): Contract {
   const job = raw.job ?? {};
@@ -38,9 +50,13 @@ export const contractsService = {
     const res = await apiClient.post<any>(`/contracts/hire/${applicationId}`);
     return normalizeContract(res.data);
   },
-  myContracts: async () => {
-    const res = await apiClient.get<any[]>("/contracts/me");
-    return res.data.map(normalizeContract);
+  myContracts: async (
+    params: { status?: ContractStatus; page?: number; limit?: number } = {},
+  ) => {
+    const res = await apiClient.get<any[]>(
+      `/contracts/me${buildQuery(params)}`,
+    );
+    return { contracts: res.data.map(normalizeContract), meta: res.meta };
   },
   getById: async (contractId: string) => {
     const res = await apiClient.get<any>(`/contracts/${contractId}`);
