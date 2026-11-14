@@ -7,25 +7,29 @@ import { ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/shared/avatar";
-import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
+
+
 import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
+
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
 import { MessageButton } from "@/features/messaging/components/message-button";
-import { PayNowButton } from "@/features/payments/components/pay-now-button";
 import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
 import {
   useApproveWork,
   useContract,
   useRequestRevision,
 } from "@/hooks/use-contracts";
+import { ContractNotice } from "@/features/payments/components/contract-notice";
+import { ContractSummaryCard } from "@/features/payments/components/contract-summary-card";
+import { SubmittedWorkCard } from "@/features/payments/components/submitted-work-card";
 
 export default function ClientContractDetailsPage() {
   const params = useParams<{ id: string }>();
-  const { data: contract, isLoading, isError } = useContract(params.id);
+  const { data: contract, isLoading } = useContract(params.id);
   const approveWork = useApproveWork();
   const requestRevision = useRequestRevision();
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -37,11 +41,16 @@ export default function ClientContractDetailsPage() {
       </div>
     );
   }
-  if (isError || !contract) notFound();
+  // Only a contract that never loaded is a 404. A failed background refresh
+  // keeps showing the data we already have.
+  if (!contract) notFound();
+
+  const contractId = contract.id;
+  const actionPending = approveWork.isPending || requestRevision.isPending;
 
   async function handleApprove() {
     try {
-      await approveWork.mutateAsync(contract!.id);
+      await approveWork.mutateAsync(contractId);
       toast.success("Work approved — contract completed!");
     } catch {
       // toasted globally
@@ -50,7 +59,7 @@ export default function ClientContractDetailsPage() {
 
   async function handleRequestRevision() {
     try {
-      await requestRevision.mutateAsync(contract!.id);
+      await requestRevision.mutateAsync(contractId);
       toast.success("Revision requested — contract set back to active.");
     } catch {
       // toasted globally
@@ -80,6 +89,12 @@ export default function ClientContractDetailsPage() {
               >
                 View freelancer profile <ExternalLink className="h-3 w-3" />
               </Link>
+              <Link
+                href={`/jobs/${contract.jobId}`}
+                className="text-brand-600 text-xs font-medium"
+              >
+                View job
+              </Link>
               <MessageButton
                 jobId={contract.jobId}
                 otherUserId={contract.freelancerId}
@@ -95,49 +110,38 @@ export default function ClientContractDetailsPage() {
         <ContractTimeline status={contract.status} />
       </Card>
 
-      {contract.status === "PENDING" && (
-        <Alert variant="info">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span>
-              This contract is pending payment. Complete payment to activate it
-              and let {contract.freelancerName} begin work.
-            </span>
-            <PayNowButton contractId={contract.id} />
-          </div>
-        </Alert>
-      )}
+      <ContractNotice contract={contract} role="CLIENT" />
 
-      {contract.status === "SUBMITTED" && (
-        <Card>
-          <h3>Submitted work</h3>
-          {contract.submissionNote && (
-            <p className="text-text-secondary mt-2 text-sm">
-              {contract.submissionNote}
-            </p>
-          )}
-          {contract.submissionUrl && (
-            <a
-              href={contract.submissionUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand-600 mt-2 block text-sm font-medium"
-            >
-              View submitted work →
-            </a>
-          )}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={handleApprove} isLoading={approveWork.isPending}>
-              Approve Work
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleRequestRevision}
-              isLoading={requestRevision.isPending}
-            >
-              Request Revision
-            </Button>
-          </div>
-        </Card>
+      <ContractSummaryCard contract={contract} />
+
+      {(contract.status === "SUBMITTED" || contract.status === "COMPLETED") && (
+        <SubmittedWorkCard
+          contract={contract}
+          title={
+            contract.status === "COMPLETED" ? "Delivered work" : "Submitted work"
+          }
+          actions={
+            contract.status === "SUBMITTED" ? (
+              <>
+                <Button
+                  onClick={handleApprove}
+                  isLoading={approveWork.isPending}
+                  disabled={actionPending}
+                >
+                  Approve Work
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleRequestRevision}
+                  isLoading={requestRevision.isPending}
+                  disabled={actionPending}
+                >
+                  Request Revision
+                </Button>
+              </>
+            ) : undefined
+          }
+        />
       )}
 
       {contract.status === "COMPLETED" && (
