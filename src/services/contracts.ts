@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { Contract } from "@/types/contract";
+import type { Contract, ContractAttachment } from "@/types/contract";
 import type { ContractStatus } from "@/types/enums";
 
 function buildQuery(params: object) {
@@ -13,6 +13,8 @@ function buildQuery(params: object) {
   return qs ? `?${qs}` : "";
 }
 
+// The API nests job / client / freelancer. We flatten them so pages keep
+// working with simple fields.
 function normalizeContract(raw: any): Contract {
   const job = raw.job ?? {};
   const client = raw.client ?? {};
@@ -62,13 +64,20 @@ export const contractsService = {
     const res = await apiClient.get<any>(`/contracts/${contractId}`);
     return normalizeContract(res.data);
   },
+  // Manual fallback; payment normally activates the contract. Not wired into
+  // any screen.
   activate: async (contractId: string) => {
     const res = await apiClient.patch<any>(`/contracts/${contractId}/activate`);
     return normalizeContract(res.data);
   },
+  // At least one of note, link or attachments is required (up to 5 files).
   submit: async (
     contractId: string,
-    payload: { submissionNote?: string; submissionUrl?: string },
+    payload: {
+      submissionNote?: string;
+      submissionUrl?: string;
+      attachments?: ContractAttachment[];
+    },
   ) => {
     const res = await apiClient.patch<any>(
       `/contracts/${contractId}/submit`,

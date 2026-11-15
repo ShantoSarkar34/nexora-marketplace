@@ -10,6 +10,7 @@ import {
 
 import { isAwaitingActivation } from "@/features/contracts/utils";
 import { contractsService } from "@/services/contracts";
+import type { ContractAttachment } from "@/types/contract";
 import type { ContractStatus } from "@/types/enums";
 
 // While a payment is being confirmed, check the contract every few seconds,
@@ -106,6 +107,7 @@ export function useSubmitWork() {
       contractId: string;
       submissionNote?: string;
       submissionUrl?: string;
+      attachments?: ContractAttachment[];
     }) => contractsService.submit(contractId, payload),
     onSuccess: () => invalidateContractData(qc),
   });
