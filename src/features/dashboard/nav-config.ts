@@ -14,6 +14,7 @@ import {
   CreditCard,
   Mail,
   MessageSquare,
+  Scale,
   Send,
   Sparkles,
   Wallet,
@@ -34,11 +35,7 @@ export const freelancerNavItems: NavItem[] = [
   { label: "Browse Jobs", href: "/freelancer/jobs", icon: Search },
   { label: "Matched Jobs", href: "/freelancer/recommended", icon: Sparkles },
   { label: "Saved Jobs", href: "/freelancer/saved-jobs", icon: Bookmark },
-  {
-    label: "My Applications",
-    href: "/freelancer/applications",
-    icon: FileText,
-  },
+  { label: "My Applications", href: "/freelancer/applications", icon: FileText },
   { label: "Invitations", href: "/freelancer/invitations", icon: Mail },
   {
     label: "Messages",
@@ -48,6 +45,7 @@ export const freelancerNavItems: NavItem[] = [
   },
   { label: "My Contracts", href: "/freelancer/contracts", icon: Briefcase },
   { label: "Earnings", href: "/freelancer/earnings", icon: Wallet },
+  { label: "Disputes", href: "/freelancer/disputes", icon: Scale },
   { label: "Notifications", href: "/freelancer/notifications", icon: Bell },
   { label: "Settings", href: "/freelancer/settings", icon: Settings },
 ];
@@ -67,6 +65,7 @@ export const clientNavItems: NavItem[] = [
   },
   { label: "Contracts", href: "/client/contracts", icon: FileSignature },
   { label: "Payments", href: "/client/payments", icon: CreditCard },
+  { label: "Disputes", href: "/client/disputes", icon: Scale },
   { label: "Notifications", href: "/client/notifications", icon: Bell },
   { label: "Settings", href: "/client/settings", icon: Settings },
 ];
