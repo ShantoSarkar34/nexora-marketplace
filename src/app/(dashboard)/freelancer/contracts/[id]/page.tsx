@@ -11,14 +11,17 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { CancelContractDialog } from "@/features/contracts/components/cancel-contract-dialog";
 import { ContractTimeline } from "@/features/contracts/components/contract-timeline";
+import { SubmitWorkCard } from "@/features/contracts/components/submit-work-card";
+import { SubmittedWorkCard } from "@/features/contracts/components/submitted-work-card";
 import { ContractStatusBadge } from "@/features/contracts/status-badge";
+import { ContractDisputeSection } from "@/features/disputes/components/contract-dispute-section";
+import { OpenDisputeButton } from "@/features/disputes/components/open-dispute-button";
+import { canOpenDispute } from "@/features/disputes/utils";
 import { MessageButton } from "@/features/messaging/components/message-button";
 import { ContractReviewSection } from "@/features/reviews/components/contract-review-section";
 import { useContract } from "@/hooks/use-contracts";
 import { ContractNotice } from "@/features/payments/components/contract-notice";
 import { ContractSummaryCard } from "@/features/payments/components/contract-summary-card";
-import { SubmitWorkCard } from "@/features/payments/components/submit-work-card";
-import { SubmittedWorkCard } from "@/features/payments/components/submitted-work-card";
 
 export default function FreelancerContractDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -32,8 +35,17 @@ export default function FreelancerContractDetailsPage() {
       </div>
     );
   }
-
+  // Only a contract that never loaded is a 404. A failed background refresh
+  // keeps showing the data we already have.
   if (!contract) notFound();
+
+  const canCancel = contract.status === "PENDING" || contract.status === "ACTIVE";
+  // Work that was submitted stays visible while it's disputed: it is the
+  // evidence both sides need.
+  const showWork =
+    contract.status === "SUBMITTED" ||
+    contract.status === "COMPLETED" ||
+    contract.status === "DISPUTED";
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -79,13 +91,15 @@ export default function FreelancerContractDetailsPage() {
 
       <ContractNotice contract={contract} role="FREELANCER" />
 
+      <ContractDisputeSection contract={contract} role="FREELANCER" />
+
       <ContractSummaryCard contract={contract} />
 
       {contract.status === "ACTIVE" && (
         <SubmitWorkCard contractId={contract.id} />
       )}
 
-      {(contract.status === "SUBMITTED" || contract.status === "COMPLETED") && (
+      {showWork && (
         <SubmittedWorkCard contract={contract} title="Your submission" />
       )}
 
@@ -96,10 +110,18 @@ export default function FreelancerContractDetailsPage() {
         />
       )}
 
-      {(contract.status === "PENDING" || contract.status === "ACTIVE") && (
-        <Button variant="destructive" onClick={() => setCancelOpen(true)}>
-          Cancel Contract
-        </Button>
+      {(canCancel || canOpenDispute(contract.status)) && (
+        <div className="flex flex-wrap gap-2">
+          {canCancel && (
+            <Button variant="destructive" onClick={() => setCancelOpen(true)}>
+              Cancel Contract
+            </Button>
+          )}
+          <OpenDisputeButton
+            contractId={contract.id}
+            status={contract.status}
+          />
+        </div>
       )}
 
       <CancelContractDialog
