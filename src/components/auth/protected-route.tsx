@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/use-auth";
+import { homePathFor } from "@/lib/role-home";
 import type { UserRole } from "@/types/user";
 
 interface ProtectedRouteProps {
@@ -18,11 +19,10 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const router = useRouter();
   const { user, isLoading, isAuthenticated, isSuspended } = useAuth();
+  const role = user?.role;
 
   const isWrongRole =
-    !isLoading && allowedRoles && user
-      ? !allowedRoles.includes(user.role)
-      : false;
+    !isLoading && allowedRoles && role ? !allowedRoles.includes(role) : false;
 
   useEffect(() => {
     if (isLoading) return;
@@ -34,10 +34,11 @@ export function ProtectedRoute({
       router.replace("/login");
       return;
     }
-    if (isWrongRole) {
-      router.replace("/");
+    // Send people to their own area instead of dropping them on the homepage.
+    if (isWrongRole && role) {
+      router.replace(homePathFor(role));
     }
-  }, [isLoading, isSuspended, isAuthenticated, isWrongRole, router]);
+  }, [isLoading, isSuspended, isAuthenticated, isWrongRole, role, router]);
 
   if (isLoading || isSuspended || !isAuthenticated || isWrongRole) {
     return (
