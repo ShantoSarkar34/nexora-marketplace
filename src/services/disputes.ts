@@ -1,5 +1,9 @@
 import { apiClient } from "@/lib/api-client";
-import type { DisputeStatus } from "@/types/enums";
+import type {
+  DisputeResolution,
+  DisputeStatus,
+  RefundStatus,
+} from "@/types/enums";
 import type { Dispute, DisputeParty } from "@/types/dispute";
 
 function buildQuery(params: object) {
@@ -58,6 +62,12 @@ function normalizeDispute(raw: any): Dispute {
   };
 }
 
+export interface ResolveDisputeResult {
+  // The server's own words. When the Stripe refund failed, this says so.
+  message: string;
+  refundStatus: RefundStatus | null;
+}
+
 export const disputesService = {
   list: async (
     params: {
@@ -71,6 +81,23 @@ export const disputesService = {
     return { disputes: res.data.map(normalizeDispute), meta: res.meta };
   },
 
+  // Admin: every dispute on the platform.
+  adminList: async (
+    params: {
+      status?: DisputeStatus;
+      contractId?: string;
+      page?: number;
+      limit?: number;
+    } = {}
+  ) => {
+    const res = await apiClient.get<any[]>(
+      `/admin/disputes${buildQuery(params)}`
+    );
+    return { disputes: res.data.map(normalizeDispute), meta: res.meta };
+  },
+
+  // Participants and admins can read a dispute. Admins also get `resolvedBy`
+  // and `refund`.
   getById: async (disputeId: string) => {
     const res = await apiClient.get<any>(`/disputes/${disputeId}`);
     return normalizeDispute(res.data);
@@ -88,5 +115,21 @@ export const disputesService = {
   // is OPEN.
   withdraw: async (disputeId: string) => {
     await apiClient.patch<unknown>(`/disputes/${disputeId}/withdraw`);
+  },
+
+  // Admin only. `note` must be at least 10 characters. A refund can fail at
+  // Stripe while the dispute is still resolved, and the message says so.
+  resolve: async (
+    disputeId: string,
+    payload: { resolution: DisputeResolution; note: string }
+  ): Promise<ResolveDisputeResult> => {
+    const res = await apiClient.patch<any>(
+      `/admin/disputes/${disputeId}/resolve`,
+      payload
+    );
+    return {
+      message: res.message ?? "",
+      refundStatus: (res.data?.refundStatus ?? null) as RefundStatus | null,
+    };
   },
 };
