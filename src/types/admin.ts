@@ -1,5 +1,10 @@
 import type { StatusCounts } from "@/types/dashboard";
-import type { ContractStatus, JobStatus } from "@/types/enums";
+import type {
+  BudgetType,
+  ContractStatus,
+  JobCategory,
+  JobStatus,
+} from "@/types/enums";
 import type { AuthProvider, UserRole } from "@/types/user";
 
 export interface AdminStats {
@@ -41,3 +46,31 @@ export interface AdminUserListParams {
   page?: number;
   limit?: number;
 }
+
+export interface AdminJob {
+  id: string;
+  title: string;
+  status: JobStatus;
+  category?: JobCategory;
+  budgetType?: BudgetType;
+  budgetMin: number;
+  budgetMax: number;
+  applicantCount: number;
+  createdAt: string;
+  client: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+    companyName?: string | null;
+  };
+}
+
+export interface AdminJobListParams {
+  status?: JobStatus;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+// What an admin can do to a job: stop new applications, or cancel it.
+export type AdminJobAction = "CLOSED" | "CANCELLED";

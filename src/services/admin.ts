@@ -1,5 +1,12 @@
 import { apiClient } from "@/lib/api-client";
-import type { AdminStats, AdminUser, AdminUserListParams } from "@/types/admin";
+import type {
+  AdminJob,
+  AdminJobAction,
+  AdminJobListParams,
+  AdminStats,
+  AdminUser,
+  AdminUserListParams,
+} from "@/types/admin";
 import type { StatusCounts } from "@/types/dashboard";
 import type { ContractStatus, JobStatus } from "@/types/enums";
 import type { UserRole } from "@/types/user";
@@ -83,6 +90,29 @@ function normalizeAdminUser(raw: any): AdminUser {
   };
 }
 
+// Same job fields as the public list, with the client's name and company.
+function normalizeAdminJob(raw: any): AdminJob {
+  const client = raw.client ?? {};
+
+  return {
+    id: raw.id,
+    title: raw.title ?? "Untitled job",
+    status: raw.status,
+    category: raw.category ?? undefined,
+    budgetType: raw.budgetType ?? undefined,
+    budgetMin: toNumber(raw.budgetMin),
+    budgetMax: toNumber(raw.budgetMax),
+    applicantCount: toNumber(raw.applicantCount ?? raw._count?.applications),
+    createdAt: raw.createdAt,
+    client: {
+      id: raw.clientId ?? client.id ?? "",
+      name: raw.clientName ?? client.name ?? "Unknown client",
+      imageUrl: raw.clientImageUrl ?? client.imageUrl ?? null,
+      companyName: raw.companyName ?? client.clientProfile?.companyName ?? null,
+    },
+  };
+}
+
 export const adminService = {
   stats: async (): Promise<AdminStats> => {
     const res = await apiClient.get<any>("/admin/stats");
@@ -103,5 +133,18 @@ export const adminService = {
       `/admin/users/${userId}/suspension`,
       payload
     );
+  },
+
+  listJobs: async (params: AdminJobListParams = {}) => {
+    const res = await apiClient.get<any[]>(`/admin/jobs${buildQuery(params)}`);
+    return { jobs: res.data.map(normalizeAdminJob), meta: res.meta };
+  },
+
+  // Force-close or cancel a job. `note` is optional.
+  setJobStatus: async (
+    jobId: string,
+    payload: { status: AdminJobAction; note?: string }
+  ) => {
+    await apiClient.patch<unknown>(`/admin/jobs/${jobId}/status`, payload);
   },
 };
