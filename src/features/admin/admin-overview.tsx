@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import {
   Briefcase,
+  ChevronRight,
   Lock,
   Percent,
   RotateCcw,
@@ -15,7 +17,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { StatCardSkeleton } from "@/components/dashboard/stat-card-skeleton";
 import { StatsLoadError } from "@/components/dashboard/stats-load-error";
 import { StatusBreakdownCard } from "@/components/dashboard/status-breakdown-card";
-import { countOf } from "@/features/dashboard/utils";
+import { countOf, pluralize } from "@/features/dashboard/utils";
 import {
   SummaryTile,
   SummaryTileSkeleton,
@@ -66,6 +68,22 @@ export function AdminOverview() {
         <StatsLoadError onRetry={() => stats.refetch()} />
       ) : (
         <>
+          {data.disputes.open > 0 && (
+            <Link
+              href="/admin/disputes"
+              className="border-status-pending/40 bg-status-pending/10 text-text-primary hover:bg-status-pending/15 flex items-center justify-between gap-3 rounded-md border px-4 py-3 text-sm transition-colors"
+            >
+              <span>
+                <strong>{pluralize(data.disputes.open, "dispute")}</strong>{" "}
+                waiting for review
+              </span>
+              <span className="text-brand-600 inline-flex items-center gap-1 font-medium">
+                Review
+                <ChevronRight className="h-4 w-4" />
+              </span>
+            </Link>
+          )}
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Total users"
@@ -136,6 +154,8 @@ export function AdminOverview() {
                   count: countOf(data.jobs, status),
                 }),
               )}
+              footerHref="/admin/jobs"
+              footerLabel="Moderate jobs →"
             />
             <StatusBreakdownCard
               title="Contracts by status"
@@ -147,6 +167,8 @@ export function AdminOverview() {
                   count: countOf(data.contracts, status),
                 }),
               )}
+              footerHref="/admin/disputes"
+              footerLabel="Review disputes →"
             />
           </div>
         </>
