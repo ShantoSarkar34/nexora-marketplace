@@ -10,19 +10,19 @@ function TalentCardSkeleton() {
   return (
     <div className="border-border bg-surface animate-pulse rounded-2xl border p-6">
       <div className="flex items-center gap-4">
-        <div className="bg-muted h-14 w-14 rounded-full" />
+        <div className="bg-surface-muted h-14 w-14 rounded-full" />
         <div className="flex-1 space-y-2">
-          <div className="bg-muted h-4 w-2/3 rounded" />
-          <div className="bg-muted h-3 w-1/2 rounded" />
+          <div className="bg-surface-muted h-4 w-2/3 rounded" />
+          <div className="bg-surface-muted h-3 w-1/2 rounded" />
         </div>
       </div>
-      <div className="bg-muted mt-6 h-16 rounded" />
+      <div className="bg-surface-muted mt-6 h-16 rounded" />
       <div className="mt-5 flex gap-2">
-        <div className="bg-muted h-7 w-16 rounded-full" />
-        <div className="bg-muted h-7 w-20 rounded-full" />
-        <div className="bg-muted h-7 w-14 rounded-full" />
+        <div className="bg-surface-muted h-7 w-16 rounded-full" />
+        <div className="bg-surface-muted h-7 w-20 rounded-full" />
+        <div className="bg-surface-muted h-7 w-14 rounded-full" />
       </div>
-      <div className="bg-muted mt-6 h-10 rounded" />
+      <div className="bg-surface-muted mt-6 h-10 rounded" />
     </div>
   );
 }
@@ -98,7 +98,7 @@ export function FeaturedTalent() {
           <div className="mt-10 flex justify-center">
             <Link
               href="/freelancers"
-              className="border-border text-text-primary hover:border-brand-500/50 hover:bg-brand-500/3 inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
+              className="border-border text-text-primary hover:border-brand-500/50 hover:bg-brand-500/5 inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
             >
               Explore freelancers
               <ArrowRight className="h-4 w-4" />
