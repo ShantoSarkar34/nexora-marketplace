@@ -148,7 +148,7 @@ export function ConversationList({
                       {conversationPreviewText(conversation, myId)}
                     </p>
                     {hasUnread && (
-                      <span className="bg-brand-600 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
+                      <span className="bg-brand-solid inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white">
                         {conversation.unreadCount > 99
                           ? "99+"
                           : conversation.unreadCount}

@@ -302,7 +302,7 @@ export function ConversationThread({
                           className={cn(
                             "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm sm:max-w-[75%]",
                             mine
-                              ? "bg-brand-600 rounded-br-md text-white"
+                              ? "bg-brand-solid rounded-br-md text-white"
                               : "bg-surface-muted text-text-primary rounded-bl-md",
                           )}
                         >
@@ -329,7 +329,7 @@ export function ConversationThread({
               <button
                 type="button"
                 onClick={scrollToBottom}
-                className="bg-brand-600 absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-white shadow-lg"
+                className="bg-brand-solid absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-white shadow-lg"
               >
                 <ArrowDown className="h-3.5 w-3.5" />
                 New messages

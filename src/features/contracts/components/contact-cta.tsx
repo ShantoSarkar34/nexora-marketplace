@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 export function ContactCta() {
   return (
     <section className="px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-      <div className="bg-brand-600 mx-auto max-w-5xl overflow-hidden rounded-2xl">
+      <div className="bg-brand-solid mx-auto max-w-5xl overflow-hidden rounded-2xl">
         <div className="px-6 py-12 text-center sm:px-10 lg:px-16 lg:py-14">
           <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-white/10">
             <Sparkles className="h-5 w-5 text-white" />
@@ -22,7 +22,7 @@ export function ContactCta() {
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/register"
-              className="text-brand-700 inline-flex items-center justify-center rounded-md bg-white px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white/90"
+              className="text-brand-solid inline-flex items-center justify-center rounded-md bg-white px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-white/90"
             >
               Create an account
               <ArrowRight className="ml-2 h-4 w-4" />

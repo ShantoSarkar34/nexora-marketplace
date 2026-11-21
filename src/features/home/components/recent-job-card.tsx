@@ -72,7 +72,7 @@ export function RecentJobCard({ job }: { job: Job }) {
 
           <Link
             href={`/jobs/${job.id}`}
-            className="bg-brand-600 hover:bg-brand-600/90 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-sm font-medium text-white transition-colors"
+            className="bg-brand-solid hover:bg-brand-solid-hover inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-sm font-medium text-white transition-colors"
           >
             View job
             <ArrowUpRight className="h-4 w-4" />

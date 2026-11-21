@@ -13,7 +13,7 @@ export function HomeCta() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
-          className="bg-text-primary relative isolate overflow-hidden rounded-3xl px-6 py-14 text-white sm:px-12 sm:py-16 lg:px-16 dark:bg-[#192338]"
+          className="bg-text-primary dark:bg-surface relative isolate overflow-hidden rounded-3xl px-6 py-14 text-white sm:px-12 sm:py-16 lg:px-16"
         >
           {/* Decorative background elements */}
           <div className="bg-brand-500/20 pointer-events-none absolute -top-24 right-0 -z-10 h-72 w-72 rounded-full blur-3xl" />
@@ -39,7 +39,7 @@ export function HomeCta() {
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Link
                 href="/register"
-                className="bg-brand-500/80 hover:bg-brand-500 flex items-center justify-center rounded-lg p-4 text-white"
+                className="bg-brand-solid hover:bg-brand-solid-hover flex items-center justify-center rounded-lg p-4 text-white"
               >
                 <p>Join Nexora</p>
                 <ArrowRight className="ml-2 h-4 w-4" />

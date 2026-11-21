@@ -29,7 +29,7 @@ export function ContractTimeline({ status }: { status: ContractStatus }) {
                 className={cn(
                   "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold",
                   isDone
-                    ? "bg-brand-600 text-white"
+                    ? "bg-brand-solid text-white"
                     : "bg-surface-muted text-text-secondary",
                 )}
               >
@@ -41,7 +41,7 @@ export function ContractTimeline({ status }: { status: ContractStatus }) {
               <div
                 className={cn(
                   "mx-2 h-0.5 flex-1",
-                  i < currentIndex ? "bg-brand-600" : "bg-surface-muted",
+                  i < currentIndex ? "bg-brand-solid" : "bg-surface-muted",
                 )}
               />
             )}

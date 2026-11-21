@@ -71,7 +71,7 @@ export function FeaturedTalent() {
             <button
               type="button"
               onClick={() => refetch()}
-              className="bg-brand-600 hover:bg-brand-600/90 mt-5 rounded-lg px-4 py-2.5 text-sm font-medium text-white"
+              className="bg-brand-solid hover:bg-brand-solid-hover mt-5 rounded-lg px-4 py-2.5 text-sm font-medium text-white"
             >
               Try again
             </button>

@@ -159,11 +159,11 @@ export default function AboutPage() {
         viewport={{ once: true }}
         variants={fadeUp}
         transition={{ duration: 0.5 }}
-        className="bg-brand-600"
+        className="bg-brand-solid"
       >
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
           <h2 className="text-white">Ready to try it yourself?</h2>
-          <p className="mt-3 text-brand-100">
+          <p className="mt-3 text-white/80">
             Join as a freelancer or post your first job as a client.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -171,7 +171,7 @@ export default function AboutPage() {
               <Button size="lg" variant="secondary">Find work</Button>
             </Link>
             <Link href="/register?role=client">
-              <Button size="lg" className="bg-white text-brand-600 hover:bg-brand-50">
+              <Button size="lg" className="bg-white text-brand-solid hover:bg-white/90">
                 Hire talent
               </Button>
             </Link>
