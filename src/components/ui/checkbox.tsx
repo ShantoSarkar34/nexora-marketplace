@@ -3,8 +3,8 @@ import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-export type CheckboxProps = Omit <
- React.InputHTMLAttributes<HTMLInputElement>,
+export type CheckboxProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
   "type"
 >;
 
