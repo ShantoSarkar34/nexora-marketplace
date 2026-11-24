@@ -11,7 +11,7 @@
 ![Stripe](https://img.shields.io/badge/Stripe-635BFF?logo=stripe&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?logo=vercel&logoColor=white)
 
-**Live app:** https://find-nexora.vercel.app
+**Live app:** https://find-nexora.vercel.app/
 **API:** https://nexora-marketplace-backend.vercel.app/api/v1
 
 ---
