@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { GoogleSignInButton } from "@/components/shared/google-sign-in-button";
 import { useGoogleLogin, useLogin } from "@/hooks/use-auth-mutations";
 import { loginSchema, type LoginFormValues } from "@/features/auth/schemas";
+import { homePathFor } from "@/lib/role-home";
+import type { UserRole } from "@/types/user";
 
 export function LoginForm() {
   const router = useRouter();
@@ -31,10 +33,8 @@ export function LoginForm() {
     defaultValues: { email: searchParams.get("email") ?? "" },
   });
 
-  function redirectAfterAuth(role: string) {
-    router.push(
-      role === "CLIENT" ? "/client/dashboard" : "/freelancer/dashboard",
-    );
+  function redirectAfterAuth(role: UserRole) {
+    router.push(homePathFor(role));
   }
 
   async function onSubmit(values: LoginFormValues) {
