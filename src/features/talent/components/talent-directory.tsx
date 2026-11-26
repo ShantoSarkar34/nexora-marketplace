@@ -26,7 +26,6 @@ const PAGE_SIZE = 9;
 
 type SortOption = NonNullable<FreelancerListParams["sortBy"]>;
 
-// "" or a bad number means "no limit". Negative numbers are ignored.
 function toRate(value: string): number | undefined {
   if (!value.trim()) return undefined;
   const parsed = Number(value);
@@ -54,8 +53,6 @@ function TalentCardSkeleton() {
   );
 }
 
-// Shown to a client who arrived from "Invite talent" on one of their jobs.
-// Only mounted for clients, because it loads the client's own jobs.
 function InviteContextBanner({ jobId }: { jobId: string }) {
   const { data } = useMyJobs({ limit: 50 });
   const job = (data?.jobs ?? []).find(

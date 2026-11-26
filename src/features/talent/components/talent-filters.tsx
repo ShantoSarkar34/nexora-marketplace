@@ -59,7 +59,6 @@ export function TalentFilters({
   const [skillDraft, setSkillDraft] = useState("");
 
   function addSkills() {
-    // Allow "React, Node.js" in one go.
     const incoming = skillDraft
       .split(",")
       .map((name) => name.trim())

@@ -30,7 +30,7 @@ export function ChangePasswordCard({ user }: { user: AuthUser }) {
     resolver: zodResolver(changePasswordSchema),
   });
 
-  // Google-only accounts have no Nexora password to change.
+
   if (user.provider !== "LOCAL") {
     return (
       <Card>
@@ -55,7 +55,6 @@ export function ChangePasswordCard({ user }: { user: AuthUser }) {
       if (error instanceof ApiError && error.errors) {
         applyApiFieldErrors(setError, error.errors);
       }
-      // Everything else (wrong current password, rate limit) is toasted globally.
     }
   }
 
