@@ -1,6 +1,7 @@
 "use client";
 
 import { AboutHero } from "./components/about-hero";
+import { AboutLifecycle } from "./components/about-lifecycle";
 import { AboutPrinciples } from "./components/about-principles";
 import { AboutStory } from "./components/about-story";
 
@@ -10,6 +11,7 @@ export function AboutPage() {
       <AboutHero />
       <AboutStory />
       <AboutPrinciples />
+      <AboutLifecycle />
     </div>
   );
 }
