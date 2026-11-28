@@ -56,7 +56,7 @@ export function AboutHero() {
       />
       <div
         aria-hidden="true"
-        className="bg-brand-500/10 pointer-events-none absolute -top-32 left-1/3 -z-10 h-80 w-[42rem] -translate-x-1/2 rounded-full blur-3xl"
+        className="bg-brand-500/10 pointer-events-none absolute -top-32 left-1/3 -z-10 h-80 w-2xl -translate-x-1/2 rounded-full blur-3xl"
       />
       <div
         aria-hidden="true"
@@ -134,7 +134,7 @@ export function AboutHero() {
           >
             <div
               aria-hidden="true"
-              className="bg-brand-500/10 absolute -inset-5 rounded-[2rem] blur-2xl"
+              className="bg-brand-500/10 absolute -inset-5 rounded-4xl blur-2xl"
             />
 
             <div className="border-border bg-surface shadow-brand-950/10 relative overflow-hidden rounded-3xl border p-4 shadow-xl sm:p-5 dark:shadow-black/25">

@@ -127,14 +127,14 @@ export function AboutAudiences() {
                             audience.accent,
                           )}
                         >
-                          <Check className="h-3 w-3" />
+                          <Check className="h-3 w-3 " />
                         </span>
                         <span>{point}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="relative mt-8 pt-2">
+                  <div className="relative mt-8 pt-2 ">
                     <Link
                       href={audience.href}
                       className={cn(
